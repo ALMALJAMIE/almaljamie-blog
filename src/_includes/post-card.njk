@@ -1,0 +1,8 @@
+<article class="card">
+  <p class="meta">
+    {% if p.data.category %}<span class="kicker">{{ p.data.category }}</span>{% endif %}
+    <time datetime="{{ p.date | isoDate }}">{{ p.date | arDate }}</time>
+  </p>
+  <h3><a href="{{ p.url }}">{{ p.data.title }}</a></h3>
+  {% if p.data.summary %}<p>{{ p.data.summary }}</p>{% endif %}
+</article>

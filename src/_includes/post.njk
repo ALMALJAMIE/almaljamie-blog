@@ -1,0 +1,37 @@
+---
+layout: base.njk
+---
+<article class="wrap post">
+  <header class="post-head">
+    {% if category %}<a class="kicker" href="/articles/">{{ category }}</a>{% endif %}
+    <h1>{{ title }}</h1>
+    {% if summary %}<p class="lede">{{ summary }}</p>{% endif %}
+    <p class="meta">
+      <time datetime="{{ page.date | isoDate }}">{{ page.date | arDate }}</time>
+      <span aria-hidden="true">·</span>
+      <span>{{ content | readingTime }}</span>
+      {% if source %}<span aria-hidden="true">·</span><span>نُشر أيضًا في {% if sourceUrl %}<a href="{{ sourceUrl }}">{{ source }}</a>{% else %}{{ source }}{% endif %}</span>{% endif %}
+    </p>
+  </header>
+
+  <div class="prose">
+    {{ content | safe }}
+  </div>
+
+  <footer class="post-foot">
+    <div class="byline">
+      <img src="/images/author.jpg" alt="" width="56" height="56" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'avatar',textContent:'أ'}))">
+      <div>
+        <strong>{{ site.title }}</strong>
+        <span>{{ site.tagline }}</span>
+      </div>
+    </div>
+    {% set posts = collections.posts %}
+    {% set prev = posts | getNextCollectionItem(page) %}
+    {% set next = posts | getPreviousCollectionItem(page) %}
+    <nav class="pager" aria-label="مقالات أخرى">
+      {% if next %}<a class="pager-next" href="{{ next.url }}"><small>المقال الأحدث</small>{{ next.data.title }}</a>{% else %}<span></span>{% endif %}
+      {% if prev %}<a class="pager-prev" href="{{ prev.url }}"><small>المقال الأقدم</small>{{ prev.data.title }}</a>{% endif %}
+    </nav>
+  </footer>
+</article>

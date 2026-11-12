@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if title %}{{ title }} — {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ summary or site.description }}">
+  <meta property="og:title" content="{{ title or site.title }}">
+  <meta property="og:description" content="{{ summary or site.description }}">
+  <meta property="og:type" content="{% if layout == 'post.njk' %}article{% else %}website{% endif %}">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <meta property="og:locale" content="ar_AR">
+  <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="/feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <a class="brand" href="/">
+        <span class="brand-name">{{ site.title }}</span>
+        <span class="brand-tag">{{ site.tagline }}</span>
+      </a>
+      <nav class="nav" aria-label="القائمة الرئيسية">
+        {% set links = [["/", "الرئيسية"], ["/articles/", "المقالات"], ["/research/", "الدراسات"], ["/about/", "عن الكاتب"], ["/contact/", "تواصل"]] %}
+        {% for l in links %}
+          <a href="{{ l[0] }}"{% if page.url == l[0] %} aria-current="page"{% endif %}>{{ l[1] }}</a>
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    {{ content | safe }}
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p>© {{ build.year }} {{ site.title }}. جميع الحقوق محفوظة.</p>
+      <p class="footer-links">
+        <a href="/feed.xml">الخلاصة (RSS)</a>
+        {% if site.facebook %}<a href="{{ site.facebook }}" rel="me">فيسبوك</a>{% endif %}
+        {% if site.x %}<a href="{{ site.x }}" rel="me">إكس</a>{% endif %}
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

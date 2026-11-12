@@ -1,0 +1,56 @@
+---
+layout: base.njk
+---
+{% set posts = collections.posts %}
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <h1>أكتب عن المجتمع اليمني:<br>كيف يفكّر، وكيف يتغيّر.</h1>
+      <p>أنا أحمد عباس الملجمي، باحث يمني في علم الاجتماع والأنثروبولوجيا، مقيم في كوالالمبور. أنشر هنا مقالاتي، وأعرض دراساتي في مشروع «محددات الذهنية اليمنية».</p>
+      <p class="hero-links"><a class="btn" href="/articles/">اقرأ المقالات</a> <a class="btn btn-quiet" href="/about/">عن الكاتب</a></p>
+    </div>
+  </div>
+</section>
+
+{% if posts.length %}
+{% set lead = posts[0] %}
+<section class="wrap lead">
+  <p class="section-label">أحدث ما كُتب</p>
+  <article>
+    <p class="meta">
+      {% if lead.data.category %}<span class="kicker">{{ lead.data.category }}</span>{% endif %}
+      <time datetime="{{ lead.date | isoDate }}">{{ lead.date | arDate }}</time>
+    </p>
+    <h2><a href="{{ lead.url }}">{{ lead.data.title }}</a></h2>
+    {% if lead.data.summary %}<p class="lede">{{ lead.data.summary }}</p>{% endif %}
+    <a class="more" href="{{ lead.url }}">أكمل القراءة ←</a>
+  </article>
+</section>
+{% endif %}
+
+{% if posts.length > 1 %}
+<section class="wrap">
+  <div class="section-head">
+    <p class="section-label">مقالات سابقة</p>
+    <a href="/articles/">كل المقالات</a>
+  </div>
+  <div class="grid">
+    {% for p in posts.slice(1, 7) %}{% include "post-card.njk" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="wrap project">
+  <p class="section-label">المشروع البحثي</p>
+  <h2>محددات الذهنية اليمنية</h2>
+  <p>مشروع يدرس العوامل التي شكّلت طريقة تفكير الإنسان اليمني عبر ستة محددات. صدرت منه دراسة المحدد الاجتماعي، والعمل جارٍ على دراسة المحدد الاقتصادي.</p>
+  <ol class="determinants">
+    <li class="done">الاجتماعي<small>منشورة</small></li>
+    <li class="current">الاقتصادي<small>قيد الإنجاز</small></li>
+    <li>السياسي</li>
+    <li>الديني</li>
+    <li>الثقافي</li>
+    <li>الجغرافي</li>
+  </ol>
+  <a class="more" href="/research/">تفاصيل الدراسات ←</a>
+</section>
