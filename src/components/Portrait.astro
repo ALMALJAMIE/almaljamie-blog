@@ -5,5 +5,5 @@ const { class: cls = "", size = "text-7xl" } = Astro.props;
 ---
 <div class={`relative overflow-hidden bg-indigo ${cls}`}>
   <span class={`absolute inset-0 grid place-items-center text-white/90 font-bold ${size}`} aria-hidden="true">أ</span>
-  <img src="/images/author.jpg" alt="أحمد عباس الملجمي" class="relative w-full h-full object-cover" onerror="this.remove()" />
+  <img src="/images/author.jpg" alt="أحمد عباس الملجمي" class="relative w-full h-full object-cover object-[50%_20%]" onerror="this.remove()" />
 </div>
