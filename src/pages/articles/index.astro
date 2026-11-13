@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import PageHead from "../../components/PageHead.astro";
 import ArticleList from "../../components/ArticleList.astro";
-import { getPosts } from "../../data/utils";
+import { getPosts, arCount } from "../../data/utils";
 
 const PER_PAGE = 8;
 const posts = await getPosts();
@@ -10,6 +10,6 @@ const categories = [...new Set(posts.map((p) => p.data.category))];
 const last = Math.max(1, Math.ceil(posts.length / PER_PAGE));
 ---
 <Base title="المقالات" description="مقالات أحمد عباس الملجمي في المجتمع اليمني وتحولاته.">
-  <PageHead title="المقالات" lead={`${posts.length} مقالات في الشأن اليمني، من الأحدث إلى الأقدم.`} />
+  <PageHead title="المقالات" lead={`${arCount(posts.length, "مقال واحد", "مقالان", "مقالات", "مقالًا")} في الشأن اليمني، من الأحدث إلى الأقدم.`} />
   <ArticleList posts={posts.slice(0, PER_PAGE)} current={1} last={last} categories={categories} />
 </Base>

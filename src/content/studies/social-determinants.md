@@ -5,7 +5,7 @@ status: published
 # journal: اسم المجلة
 # issue: المجلد والعدد
 # year: 2025
-# pdf: /files/social-determinants.pdf
+pdf: /files/social-determinants.pdf
 summary: الدراسة الأولى في مشروع «محددات الذهنية اليمنية»، وتتناول أثر البنية الاجتماعية في تشكّل طريقة تفكير الإنسان اليمني.
 order: 30
 ---

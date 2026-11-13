@@ -3,16 +3,16 @@ import Base from "../layouts/Base.astro";
 import PostItem from "../components/PostItem.astro";
 import StudyCard from "../components/StudyCard.astro";
 import Portrait from "../components/Portrait.astro";
-import { getPosts, getStudies } from "../data/utils";
+import { getPosts, getStudies, arCount } from "../data/utils";
 import { notebook } from "../data/site";
 
 const posts = await getPosts();
 const studies = await getStudies();
 
 const sections = [
-  { href: "/articles/", title: "المقالات", text: "مقالات رأي وتحليل في الشأن اليمني، وفي محافظة البيضاء خاصة.", count: `${posts.length} مقالات`,
+  { href: "/articles/", title: "المقالات", text: "مقالات رأي وتحليل في الشأن اليمني، وفي محافظة البيضاء خاصة.", count: arCount(posts.length, "مقال واحد", "مقالان", "مقالات", "مقالًا"),
     icon: "M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" },
-  { href: "/studies/", title: "الدراسات المنشورة", text: "دراسات محكّمة وأعمال أكاديمية، متاحة للتنزيل مجانًا بصيغة PDF.", count: `${studies.length} أعمال`,
+  { href: "/studies/", title: "الدراسات المنشورة", text: "دراسات محكّمة وأعمال أكاديمية، متاحة للتنزيل مجانًا بصيغة PDF.", count: arCount(studies.length, "دراسة واحدة", "دراستان", "دراسات", "دراسة"),
     icon: "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5" },
   { href: "/cv/", title: "السيرة الذاتية", text: "المسار الأكاديمي، والاهتمامات البحثية، والمشاركات العلمية.", count: "",
     icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0" },

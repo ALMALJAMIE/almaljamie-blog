@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import PageHead from "../components/PageHead.astro";
 import StudyCard from "../components/StudyCard.astro";
-import { getStudies } from "../data/utils";
+import { getStudies, arCount } from "../data/utils";
 const studies = await getStudies();
 const published = studies.filter((s) => s.data.status === "published");
 const inProgress = studies.filter((s) => s.data.status === "in-progress");
@@ -11,7 +11,7 @@ const inProgress = studies.filter((s) => s.data.status === "in-progress");
   <PageHead title="الدراسات المنشورة" lead="دراسات محكّمة وأعمال أكاديمية في المجتمع اليمني. كلها متاحة للتنزيل مجانًا بصيغة PDF، ويُرجى ذكر المصدر عند الاقتباس." />
 
   <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-12">
-    <p class="text-[var(--muted)]">{published.length} أعمال منشورة{inProgress.length ? `، و${inProgress.length} قيد الإنجاز` : ""}</p>
+    <p class="text-[var(--muted)]">{arCount(published.length, "دراسة منشورة واحدة", "دراستان منشورتان", "دراسات منشورة", "دراسة منشورة")}{inProgress.length ? `، و${inProgress.length} قيد الإنجاز` : ""}</p>
     <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {[...published, ...inProgress].map((s) => <StudyCard study={s} />)}
     </div>

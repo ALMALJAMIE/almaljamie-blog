@@ -30,3 +30,11 @@ export async function getStudies() {
   const all = await getCollection("studies");
   return all.sort((a, b) => b.data.order - a.data.order || (b.data.year ?? 0) - (a.data.year ?? 0));
 }
+
+// عدّ بالعربية: arCount(n, "مقال واحد", "مقالان", "مقالات", "مقالًا")
+export function arCount(n: number, one: string, two: string, few: string, many: string) {
+  if (n === 1) return one;
+  if (n === 2) return two;
+  if (n >= 3 && n <= 10) return `${n} ${few}`;
+  return `${n} ${many}`;
+}
