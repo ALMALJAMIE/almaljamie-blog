@@ -1,0 +1,57 @@
+---
+// غلاف مولَّد لكل مقال: واجهة بيت يمني بنوافذ مقوّسة، يضيء بعضها بزجاج ملوّن
+// يختلف الشكل باختلاف عنوان المقال، ويختلف اللون الأساسي باختلاف التصنيف
+import { seed } from "../data/utils";
+interface Props { id: string; category: string; class?: string; image?: string; alt?: string }
+const { id, category, class: cls = "", image, alt = "" } = Astro.props;
+
+const bases = ["#1c2b4b", "#6b4630", "#1f4a3f", "#233d6b", "#4a2f3c"];
+const glass = ["#b23a2e", "#2f7a62", "#3466a8", "#d99a1e"];
+let s = seed(id);
+const rnd = () => ((s = Math.imul(s ^ (s >>> 15), 2246822507) ^ Math.imul(s ^ (s >>> 13), 3266489909)), (s >>>= 0), s / 4294967296);
+const base = bases[seed(category) % bases.length];
+
+const W = 1200, H = 675;
+const cols = 9, ww = 64, wh = 104, gapX = (W - cols * ww) / (cols + 1);
+const floors = [70, 290, 510];
+const windows: { x: number; y: number; lit: string | null }[] = [];
+floors.forEach((y) => {
+  for (let c = 0; c < cols; c++) {
+    const r = rnd();
+    windows.push({ x: gapX + c * (ww + gapX), y, lit: r < 0.32 ? glass[Math.floor(rnd() * glass.length)] : null });
+  }
+});
+const shift = Math.floor(rnd() * 24);
+---
+{image ? (
+  <img class={`object-cover ${cls}`} src={image} alt={alt} loading="lazy" />
+) : (
+  <svg class={cls} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width={W} height={H} fill={base} />
+    {floors.map((y) => (
+      <g>
+        <path
+          d={`M${-shift} ${y - 26}` + Array.from({ length: 52 }, (_, i) => `l12 -12l12 12`).join("") + `V${y - 20}H${-shift}Z`}
+          fill="#fbfaf7"
+          opacity=".9"
+        />
+      </g>
+    ))}
+    {windows.map((w) => (
+      <g>
+        <path
+          d={`M${w.x - 6} ${w.y + wh + 6}V${w.y + 26}a${ww / 2 + 6} ${ww / 2 + 6} 0 0 1 ${ww + 12} 0V${w.y + wh + 6}Z`}
+          fill="#fbfaf7"
+          opacity={w.lit ? 1 : 0.85}
+        />
+        <path
+          d={`M${w.x} ${w.y + wh}V${w.y + 26}a${ww / 2} ${ww / 2} 0 0 1 ${ww} 0V${w.y + wh}Z`}
+          fill={w.lit ?? "#111a30"}
+          opacity={w.lit ? 0.95 : 0.7}
+        />
+        {w.lit && <path d={`M${w.x + ww / 2} ${w.y + 26}V${w.y - 6}M${w.x} ${w.y + 26}H${w.x + ww}`} stroke="#fbfaf7" stroke-width="4" />}
+        <path d={`M${w.x} ${w.y + 60}H${w.x + ww}`} stroke="#fbfaf7" stroke-width="4" opacity={w.lit ? 1 : 0.6} />
+      </g>
+    ))}
+  </svg>
+)}

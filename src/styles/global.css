@@ -1,0 +1,116 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-500.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-700.css";
+@import "@fontsource/ibm-plex-sans-arabic/latin-500.css";
+@import "@fontsource/noto-naskh-arabic/arabic-400.css";
+@import "@fontsource/noto-naskh-arabic/arabic-600.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===== الألوان: نيلي عميق للهوية، وذهبي البُنّ للتمييز، وزجاج القمرية للمسات الصغيرة ===== */
+@theme {
+  --color-indigo: #13294b;      /* اللون الأساسي */
+  --color-indigo-deep: #0b1a33;
+  --color-plaster: #ffffff;
+  --color-plaster-2: #f4f5f7;
+  --color-ink: #1b2230;
+  --color-stone: #5d6573;
+  --color-line: #e3e6eb;
+  --color-mud: #8a5a1c;
+  --color-saffron: #c8962e;     /* ذهبي */
+  --color-glass-red: #b23a2e;
+  --color-glass-green: #2f7a62;
+  --color-glass-blue: #2d5c9e;
+
+  --font-display: "IBM Plex Sans Arabic", sans-serif;
+  --font-body: "IBM Plex Sans Arabic", sans-serif;
+  --font-read: "Noto Naskh Arabic", serif;
+}
+
+:root {
+  --bg: var(--color-plaster);
+  --bg-2: var(--color-plaster-2);
+  --fg: var(--color-ink);
+  --muted: var(--color-stone);
+  --rule: var(--color-line);
+  --link: var(--color-glass-blue);
+  color-scheme: light;
+}
+.dark {
+  --bg: #0d1526;
+  --bg-2: #15203a;
+  --fg: #ece9e2;
+  --muted: #a3a09a;
+  --rule: #2a3450;
+  --link: #8fb4e8;
+  color-scheme: dark;
+}
+
+@layer base {
+html { background: var(--bg); color: var(--fg); scroll-padding-top: 6rem; }
+body { font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.9; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.5; font-weight: 700; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--color-saffron); outline-offset: 3px; border-radius: 4px; }
+::selection { background: color-mix(in srgb, var(--color-saffron) 35%, transparent); }
+}
+
+/* شريط الجصّ: مثلثات بيضاء كإفريز البيوت الصنعانية */
+.frieze {
+  height: 12px;
+  background: var(--bg);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpath d='M0 12L12 0l12 12z'/%3E%3C/svg%3E") 0 0 / 24px 12px repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpath d='M0 12L12 0l12 12z'/%3E%3C/svg%3E") 0 0 / 24px 12px repeat-x;
+}
+
+/* نص المقال */
+.article {
+  font-family: var(--font-read);
+  --tw-prose-body: var(--fg);
+  --tw-prose-headings: var(--fg);
+  --tw-prose-links: var(--link);
+  --tw-prose-bold: var(--fg);
+  --tw-prose-quotes: var(--fg);
+  --tw-prose-quote-borders: var(--color-saffron);
+  --tw-prose-bullets: var(--color-saffron);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-hr: var(--rule);
+  --tw-prose-captions: var(--muted);
+  font-size: 1.25rem;
+  line-height: 2.1;
+  max-width: 38rem;
+}
+.article :where(p) { margin-block: 0 1.35em; }
+.article :where(h2) { font-size: 1.65rem; margin-top: 2em; margin-bottom: .6em; font-weight: 700; }
+.article :where(h3) { font-size: 1.3rem; margin-top: 1.6em; font-weight: 600; }
+.article :where(h2, h3) { font-family: var(--font-display); }
+.article :where(blockquote) {
+  font-family: var(--font-read); font-style: normal; font-size: 1.45rem; line-height: 1.9;
+  border-inline-start-width: 3px; padding-inline-start: 1.2em; margin-block: 2em;
+}
+.article :where(blockquote p::before, blockquote p::after) { content: none; }
+.article :where(img) { border-radius: 6px; }
+.article :where(a) { text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+/* شريط تقدّم القراءة */
+#progress { transform-origin: right; transform: scaleX(0); }
+
+/* لحظة الافتتاح الوحيدة: ألواح زجاج القمرية تضيء واحدًا بعد الآخر */
+.qamariya .pane { opacity: .15; animation: glow .9s ease forwards; }
+@keyframes glow { to { opacity: var(--o, .92); } }
+@media (prefers-reduced-motion: reduce) {
+  .qamariya .pane { animation: none; opacity: var(--o, .92); }
+  html { scroll-behavior: auto; }
+}
+
+/* Pagefind */
+.pagefind-ui { --pagefind-ui-font: var(--font-body); --pagefind-ui-primary: var(--color-glass-blue); --pagefind-ui-text: var(--fg); --pagefind-ui-background: var(--bg); --pagefind-ui-border: var(--rule); --pagefind-ui-tag: var(--bg-2); --pagefind-ui-border-radius: 8px; }
+.pagefind-ui__search-input { font-family: var(--font-display) !important; }
+
+/* نقش خلفية خفيف من أقواس القمرية */
+.pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath d='M0 40a32 32 0 0 1 64 0M12 40a20 20 0 0 1 40 0M24 40a8 8 0 0 1 16 0M32 8v32M9.4 17.4 32 40M54.6 17.4 32 40' fill='none' stroke='%23ffffff' stroke-opacity='.06' stroke-width='1.2'/%3E%3C/svg%3E");
+}

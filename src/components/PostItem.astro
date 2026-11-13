@@ -1,0 +1,46 @@
+---
+import Cover from "./Cover.astro";
+import { arDate, readingTime, type Post } from "../data/utils";
+import { site } from "../data/site";
+interface Props { post: Post; variant?: "row" | "card" }
+const { post, variant = "row" } = Astro.props;
+const href = `/articles/${post.id}/`;
+const d = post.data;
+---
+{variant === "card" ? (
+  <article class="group flex flex-col rounded-2xl bg-[var(--bg)] border border-[var(--rule)] overflow-hidden hover:border-indigo/40 hover:shadow-[0_12px_32px_-12px_rgba(19,41,75,.25)] transition">
+    <a href={href} class="block overflow-hidden" tabindex="-1" aria-hidden="true">
+      <Cover id={post.id} category={d.category} image={d.cover} class="w-full aspect-[16/9] group-hover:scale-[1.03] transition-transform duration-500" />
+    </a>
+    <div class="flex flex-col flex-1 p-6">
+      <span class="self-start text-[0.8rem] font-medium px-2.5 py-0.5 rounded-full bg-indigo/8 text-indigo dark:bg-white/10 dark:text-saffron">{d.category}</span>
+      <h3 class="mt-3 text-[1.25rem] leading-snug">
+        <a href={href} class="no-underline group-hover:text-indigo dark:group-hover:text-saffron">{d.title}</a>
+      </h3>
+      {d.summary && <p class="mt-2 text-[0.98rem] leading-[1.9] text-[var(--muted)] line-clamp-3">{d.summary}</p>}
+      <p class="mt-auto pt-5 text-[0.88rem] text-[var(--muted)] flex gap-4">
+        <time datetime={d.date.toISOString()}>{arDate(d.date)}</time>
+        <span>{readingTime(post.body)}</span>
+      </p>
+    </div>
+  </article>
+) : (
+  <article class="group grid md:grid-cols-[18rem_1fr] gap-6 md:gap-8 py-8 border-b border-[var(--rule)] items-start">
+    <a href={href} class="block overflow-hidden rounded-xl" tabindex="-1" aria-hidden="true">
+      <Cover id={post.id} category={d.category} image={d.cover} class="w-full aspect-[16/10] group-hover:scale-[1.03] transition-transform duration-500" />
+    </a>
+    <div>
+      <a href="/articles/" class="inline-block text-[0.82rem] font-medium px-2.5 py-0.5 rounded-full bg-indigo/8 text-indigo dark:bg-white/10 dark:text-saffron no-underline">{d.category}</a>
+      <h2 class="mt-2 text-[1.45rem] sm:text-[1.6rem] leading-snug">
+        <a href={href} class="no-underline group-hover:text-indigo dark:group-hover:text-saffron">{d.title}</a>
+      </h2>
+      <p class="mt-1.5 text-[0.9rem] text-[var(--muted)] flex flex-wrap gap-x-4">
+        <span>{site.title}</span>
+        <time datetime={d.date.toISOString()}>{arDate(d.date)}</time>
+        <span>{readingTime(post.body)}</span>
+      </p>
+      {d.summary && <p class="mt-3 text-[1.02rem] leading-[1.95] text-[var(--muted)] line-clamp-3">{d.summary}</p>}
+      <a href={href} class="inline-block mt-3 font-medium text-indigo dark:text-saffron">اقرأ المقال</a>
+    </div>
+  </article>
+)}

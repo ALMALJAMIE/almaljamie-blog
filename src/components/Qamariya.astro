@@ -1,0 +1,52 @@
+---
+// نافذة «قمرية» يمنية: نصف دائرة من زجاج ملوّن تفصل بين ألواحه عوارض الجصّ
+interface Props { class?: string }
+const { class: cls = "" } = Astro.props;
+
+const R = 200, cx = 210, cy = 215;
+const colors = ["#b23a2e", "#2f7a62", "#3466a8", "#d99a1e"];
+
+function sector(r1: number, r2: number, a1: number, a2: number) {
+  const p = (r: number, a: number) => [cx + r * Math.cos(a), cy - r * Math.sin(a)].map((n) => n.toFixed(2)).join(" ");
+  if (r1 === 0) return `M${cx} ${cy}L${p(r2, a1)}A${r2} ${r2} 0 0 1 ${p(r2, a2)}Z`;
+  return `M${p(r1, a1)}L${p(r2, a1)}A${r2} ${r2} 0 0 1 ${p(r2, a2)}L${p(r1, a2)}A${r1} ${r1} 0 0 0 ${p(r1, a1)}Z`;
+}
+
+type Pane = { d: string; fill: string; o: number; delay: number };
+const panes: Pane[] = [];
+const rings = [
+  { r1: 0, r2: 0.24, n: 1 },
+  { r1: 0.24, r2: 0.52, n: 6 },
+  { r1: 0.52, r2: 0.78, n: 10 },
+  { r1: 0.78, r2: 0.93, n: 16 },
+];
+let k = 0;
+rings.forEach((ring, ri) => {
+  for (let i = 0; i < ring.n; i++) {
+    const a1 = Math.PI - (i * Math.PI) / ring.n;
+    const a2 = Math.PI - ((i + 1) * Math.PI) / ring.n;
+    const fill = ri === 0 ? colors[3] : colors[(i + ri) % colors.length];
+    panes.push({
+      d: sector(ring.r1 * R, ring.r2 * R, a1, a2),
+      fill,
+      o: 0.78 + ((i * 7 + ri * 3) % 5) * 0.05,
+      delay: 0.15 + ri * 0.22 + i * 0.035,
+    });
+    k++;
+  }
+});
+---
+<svg class={`qamariya ${cls}`} viewBox="0 0 420 300" role="img" aria-label="نافذة قمرية يمنية من الزجاج الملوّن">
+  <!-- إطار الجص -->
+  <path d={`M${cx - R - 10} ${cy + 70}V${cy}A${R + 10} ${R + 10} 0 0 1 ${cx + R + 10} ${cy}V${cy + 70}Z`} fill="#fbfaf7" />
+  {panes.map((p) => (
+    <path class="pane" d={p.d} fill={p.fill} style={`--o:${p.o};animation-delay:${p.delay.toFixed(2)}s`} stroke="#fbfaf7" stroke-width="5" stroke-linejoin="round" />
+  ))}
+  <!-- العتبة وما تحتها: شبكة خشبية للنافذة -->
+  <rect x={cx - R - 10} y={cy} width={2 * R + 20} height="10" fill="#e9e5dc" />
+  <rect x={cx - R + 6} y={cy + 18} width={2 * R - 12} height="46" fill="#2a3a5e" />
+  {Array.from({ length: 9 }, (_, i) => (
+    <rect x={cx - R + 6 + (i + 1) * ((2 * R - 12) / 10) - 2} y={cy + 18} width="4" height="46" fill="#fbfaf7" />
+  ))}
+  <rect x={cx - R + 6} y={cy + 39} width={2 * R - 12} height="4" fill="#fbfaf7" />
+</svg>

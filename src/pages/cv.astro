@@ -1,0 +1,109 @@
+---
+import Base from "../layouts/Base.astro";
+import Portrait from "../components/Portrait.astro";
+import { site } from "../data/site";
+
+// البيانات الأساسية — عدّلها أو أضف إليها
+const facts = [
+  { label: "التخصص", value: "علم الاجتماع والأنثروبولوجيا" },
+  { label: "الانتماء الأكاديمي", value: "قسم التاريخ والحضارة، كلية الدراسات الإسلامية، جامعة السلطان زين العابدين، ترنجانو" },
+  { label: "البلد", value: "اليمن، محافظة البيضاء" },
+  { label: "الإقامة", value: "كوالالمبور، ماليزيا" },
+  // { label: "المؤهل العلمي", value: "" },
+  // { label: "سنة الميلاد", value: "" },
+];
+
+// أقسام السيرة — كل قسم عنوان وقائمة نقاط، والنص بين ** يظهر عريضًا
+const sections = [
+  {
+    title: "المسار الأكاديمي",
+    items: [
+      "**الماجستير:** رسالة بعنوان «التحالف العربي ودوره في استعادة شرعية الدولة في اليمن (2015–2022م)».",
+      "**البحث الحالي:** قسم التاريخ والحضارة، كلية الدراسات الإسلامية، جامعة السلطان زين العابدين، ماليزيا.",
+    ],
+  },
+  {
+    title: "المشروع البحثي",
+    items: [
+      "**محددات الذهنية اليمنية:** مشروع من ست دراسات، تتناول كل منها عاملًا من العوامل التي شكّلت طريقة تفكير الإنسان اليمني: الاجتماعي، والاقتصادي، والسياسي، والديني، والثقافي، والجغرافي.",
+      "**المنشور منه:** دراسة المحدد الاجتماعي، في مجلة محكّمة.",
+      "**قيد الإنجاز:** دراسة المحدد الاقتصادي.",
+    ],
+  },
+  {
+    title: "الاهتمامات البحثية",
+    items: [
+      "الذهنية اليمنية ومحدداتها.",
+      "البنى القبلية والأعراف في المجتمع اليمني.",
+      "تاريخ محافظة البيضاء وتحولاتها الاجتماعية.",
+      "الحرب في اليمن وآثارها على المجتمع.",
+    ],
+  },
+  {
+    title: "الكتابة والنشر",
+    items: [
+      "**دراسات محكّمة** في المجتمع اليمني، تجدها في صفحة الدراسات المنشورة.",
+      "**مقالات رأي** في الشأن اليمني وشأن محافظة البيضاء، تُنشر في المدونة وعلى منصات صحفية، منها منصة شمّر.",
+    ],
+  },
+];
+const md = (s: string) => s.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(--fg)]">$1</strong>');
+---
+<Base title="السيرة الذاتية" description="السيرة الذاتية للباحث اليمني أحمد عباس الملجمي.">
+  <section class="relative bg-indigo text-white overflow-hidden">
+    <div class="absolute inset-0 pattern"></div>
+    <div class="relative mx-auto max-w-7xl px-5 sm:px-8 py-14 md:py-16 grid md:grid-cols-[1fr_12rem] gap-10 items-center">
+      <div>
+        <nav aria-label="مسار الصفحة" class="text-[0.9rem] text-white/60">
+          <a href="/" class="no-underline hover:text-white">الرئيسية</a><span class="mx-2">/</span><span class="text-white/90">السيرة الذاتية</span>
+        </nav>
+        <h1 class="mt-3 text-[2.3rem] sm:text-[3rem]">{site.title}</h1>
+        <p class="mt-2 text-saffron text-[1.15rem]">{site.tagline}</p>
+        <p class="mt-5 flex flex-wrap gap-2 text-[0.92rem]">
+          {["باحث أكاديمي", "علم الاجتماع", "الأنثروبولوجيا", "كاتب مقالات رأي"].map((t) => <span class="px-3 py-1 rounded-full border border-white/20 bg-white/5">{t}</span>)}
+        </p>
+      </div>
+      <Portrait class="hidden md:block w-48 h-48 rounded-full ring-4 ring-saffron/60" />
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 pt-14 grid lg:grid-cols-[20rem_1fr] gap-12">
+    <aside>
+      <div class="lg:sticky lg:top-28 rounded-2xl border border-[var(--rule)] p-6">
+        <h2 class="text-[1.15rem]">بيانات أساسية</h2>
+        <dl class="mt-4 divide-y divide-[var(--rule)]">
+          {facts.map((f) => (
+            <div class="py-3">
+              <dt class="text-[0.85rem] text-[var(--muted)]">{f.label}</dt>
+              <dd class="mt-0.5 font-medium leading-[1.8]">{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </aside>
+
+    <div>
+      <p class="text-[1.15rem] leading-[2.05] max-w-3xl">
+        باحث يمني من محافظة البيضاء، مقيم في كوالالمبور. يهتم بدراسة المجتمع اليمني من الداخل: بنيته القبلية، وأعرافه، والعوامل التي صنعت طريقة تفكيره. ويجمع في عمله بين البحث الأكاديمي المحكّم وكتابة مقالات الرأي في الشأن اليمني.
+      </p>
+
+      <ol class="mt-12 space-y-12">
+        {sections.map((s, i) => (
+          <li class="grid grid-cols-[3.5rem_1fr] gap-5">
+            <span class="grid place-items-center w-14 h-14 rounded-2xl bg-indigo text-white text-[1.2rem] font-bold dark:bg-saffron dark:text-ink">{String(i + 1).padStart(2, "0")}</span>
+            <div>
+              <h2 class="text-[1.5rem] pt-2.5">{s.title}</h2>
+              <ul class="mt-4 space-y-3">
+                {s.items.map((it) => (
+                  <li class="relative ps-6 text-[1.05rem] leading-[1.95] text-[var(--muted)] before:absolute before:start-0 before:top-[0.8em] before:w-2 before:h-2 before:rounded-full before:bg-saffron">
+                    <Fragment set:html={md(it)} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</Base>

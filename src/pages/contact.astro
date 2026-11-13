@@ -1,0 +1,41 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import { site, activeSocials } from "../data/site";
+const direct = [
+  { label: "البريد الإلكتروني", value: site.email, href: site.email && `mailto:${site.email}` },
+  { label: "واتساب", value: site.whatsapp && `+${site.whatsapp}`, href: site.whatsapp && `https://wa.me/${site.whatsapp}` },
+  { label: "الهاتف", value: site.phone, href: site.phone && `tel:${site.phone.replace(/\s/g, "")}` },
+  { label: "الباحث العلمي من Google", value: site.googleScholar && "Google Scholar", href: site.googleScholar },
+  { label: "ResearchGate", value: site.researchgate && "ResearchGate", href: site.researchgate },
+].filter((i) => i.href);
+const socials = activeSocials();
+---
+<Base title="تواصل" description="للتواصل مع الباحث أحمد عباس الملجمي.">
+  <PageHead title="تواصل" lead="للتعليق على مقال، أو لدعوة إلى مشاركة بحثية أو إعلامية." />
+  <section class="mx-auto max-w-3xl px-5 sm:px-8 pt-12">
+    {direct.length || socials.length ? (
+      <>
+        <ul class="divide-y divide-[var(--rule)] rounded-2xl border border-[var(--rule)]">
+          {direct.map((i) => (
+            <li class="flex justify-between gap-6 p-5">
+              <span class="text-[var(--muted)]">{i.label}</span>
+              <a href={i.href} dir="ltr" class="font-medium text-indigo dark:text-saffron">{i.value}</a>
+            </li>
+          ))}
+        </ul>
+        {socials.length > 0 && (
+          <div class="mt-8 flex flex-wrap gap-3">
+            {socials.map((s) => (
+              <a href={s.href} rel="me noopener" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--rule)] no-underline hover:border-indigo">
+                <svg viewBox="0 0 24 24" class="w-[18px] h-[18px]" fill="currentColor" aria-hidden="true"><path d={s.d} /></svg>{s.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </>
+    ) : (
+      <p class="text-[var(--muted)] text-[1.05rem]">وسائل التواصل تُضاف قريبًا.</p>
+    )}
+  </section>
+</Base>

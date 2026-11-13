@@ -1,0 +1,9 @@
+---
+// صورة الباحث: ضعها في public/images/author.jpg. إن لم توجد يظهر الحرف الأول من الاسم
+interface Props { class?: string; size?: string }
+const { class: cls = "", size = "text-7xl" } = Astro.props;
+---
+<div class={`relative overflow-hidden bg-indigo ${cls}`}>
+  <span class={`absolute inset-0 grid place-items-center text-white/90 font-bold ${size}`} aria-hidden="true">أ</span>
+  <img src="/images/author.jpg" alt="أحمد عباس الملجمي" class="relative w-full h-full object-cover" onerror="this.remove()" />
+</div>
