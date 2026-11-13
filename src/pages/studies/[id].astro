@@ -1,0 +1,107 @@
+---
+// صفحة الدراسة: على اليمين بطاقة الدراسة وزر التنزيل، وفي الوسط ملخصها
+import { render, type CollectionEntry } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import StudyCover from "../../components/StudyCover.astro";
+import DownloadButton from "../../components/DownloadButton.astro";
+import Share from "../../components/Share.astro";
+import StudyCard from "../../components/StudyCard.astro";
+import { getStudies } from "../../data/utils";
+import { site } from "../../data/site";
+
+export async function getStaticPaths() {
+  const studies = await getStudies();
+  return studies.map((study) => ({ params: { id: study.id }, props: { study, all: studies } }));
+}
+interface Props { study: CollectionEntry<"studies">; all: CollectionEntry<"studies">[] }
+const { study, all } = Astro.props;
+const d = study.data;
+const { Content } = await render(study);
+const hasAbstract = (study.body ?? "").trim().length > 0;
+const en = d.lang === "en";
+const published = d.status === "published";
+const url = new URL(`/studies/${study.id}/`, site.url).href;
+const facts = [
+  { label: "النوع", value: published ? d.type : `${d.type} (قيد الإنجاز)` },
+  { label: "جهة النشر", value: d.journal },
+  { label: "العدد والصفحات", value: d.issue },
+  { label: "سنة النشر", value: d.year ? String(d.year) : undefined },
+  { label: "اللغة", value: en ? "الإنجليزية" : "العربية" },
+  { label: "عدد الصفحات", value: d.pages ? String(d.pages) : undefined },
+].filter((f) => f.value);
+const others = all.filter((s) => s.id !== study.id).slice(0, 3);
+---
+<Base title={d.title} description={d.summary} type="article" image={d.cover} keywords={d.keywords}>
+  <section class="relative bg-indigo text-white overflow-hidden">
+    <div class="absolute inset-0 pattern"></div>
+    <div class="relative mx-auto max-w-7xl px-5 sm:px-8 py-12 md:py-14">
+      <nav aria-label="مسار الصفحة" class="text-[0.9rem] text-white/60">
+        <a href="/" class="no-underline hover:text-white">الرئيسية</a><span class="mx-2">/</span>
+        <a href="/studies/" class="no-underline hover:text-white">الدراسات المنشورة</a>
+      </nav>
+      <h1 class="mt-3 text-[1.9rem] sm:text-[2.4rem] leading-[1.5] max-w-4xl" dir={en ? "ltr" : undefined} lang={en ? "en" : undefined}>{d.title}</h1>
+      <p class="mt-3 text-saffron text-[1.05rem]">{site.title}</p>
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 pt-12 grid lg:grid-cols-[22rem_1fr] gap-10 lg:gap-14 items-start">
+    <!-- بطاقة الدراسة -->
+    <aside class="lg:sticky lg:top-28 rounded-2xl border border-[var(--rule)] bg-[var(--bg)] overflow-hidden">
+      <div class="bg-[var(--bg-2)] p-6 pb-0">
+        <StudyCover id={study.id} title={d.title} type={d.type} year={d.year} image={d.cover}
+          class="mx-auto w-[70%] aspect-[3/4] rounded-t-md shadow-[0_-2px_24px_-6px_rgba(0,0,0,.35)]" />
+      </div>
+      <div class="p-6">
+        <dl class="divide-y divide-[var(--rule)] text-[0.98rem]">
+          {facts.map((f) => (
+            <div class="py-2.5 flex justify-between gap-4">
+              <dt class="text-[var(--muted)] shrink-0">{f.label}</dt>
+              <dd class="text-end font-medium leading-[1.7]">{f.value}</dd>
+            </div>
+          ))}
+          {d.doi && (
+            <div class="py-2.5 flex justify-between gap-4">
+              <dt class="text-[var(--muted)] shrink-0">DOI</dt>
+              <dd class="text-end font-medium" dir="ltr"><a href={`https://doi.org/${d.doi}`} class="text-indigo dark:text-saffron break-all">{d.doi}</a></dd>
+            </div>
+          )}
+        </dl>
+        <div class="mt-5"><DownloadButton id={study.id} pdf={d.pdf} pages={d.pages} published={published} /></div>
+        {d.url && <a href={d.url} target="_blank" rel="noopener" class="mt-3 flex justify-center py-2.5 rounded-xl border border-[var(--rule)] no-underline hover:border-indigo text-[0.95rem]">الدراسة على موقع الناشر</a>}
+      </div>
+    </aside>
+
+    <!-- الملخص -->
+    <article class="min-w-0" data-pagefind-body>
+      <h2 class="text-[1.6rem]">ملخص الدراسة</h2>
+      {hasAbstract ? (
+        <div class="article prose mt-5" dir={en ? "ltr" : undefined} lang={en ? "en" : undefined}>
+          <Content />
+        </div>
+      ) : (
+        <p class="mt-5 text-[1.1rem] leading-[2] text-[var(--muted)]">{d.summary}</p>
+      )}
+      {d.keywords.length > 0 && (
+        <div class="mt-8 flex flex-wrap items-center gap-2">
+          <span class="text-[var(--muted)] me-1">الكلمات المفتاحية:</span>
+          {d.keywords.map((k) => <span class="text-[0.92rem] px-3 py-1 rounded-full bg-[var(--bg-2)] border border-[var(--rule)]">{k}</span>)}
+        </div>
+      )}
+      <div class="mt-10 pt-8 border-t border-[var(--rule)]" data-pagefind-ignore>
+        <Share url={url} title={d.title} label="شارك الدراسة" />
+      </div>
+    </article>
+  </div>
+
+  {others.length > 0 && (
+    <section class="mx-auto max-w-7xl px-5 sm:px-8 mt-20" data-pagefind-ignore>
+      <div class="flex items-end justify-between">
+        <h2 class="text-[1.6rem]">دراسات أخرى</h2>
+        <a href="/studies/" class="font-medium text-indigo dark:text-saffron">كل الدراسات</a>
+      </div>
+      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {others.map((s) => <StudyCard study={s} />)}
+      </div>
+    </section>
+  )}
+</Base>

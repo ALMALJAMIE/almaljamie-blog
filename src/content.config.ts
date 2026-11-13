@@ -37,6 +37,10 @@ const studies = defineCollection({
     pages: z.number().optional(),
     cover: z.string().optional(),
     order: z.number().default(0),                 // للترتيب: الأكبر أولًا
+    lang: z.enum(["ar", "en"]).default("ar"),     // لغة الدراسة
+    doi: z.string().optional(),                   // مثل: 10.33774/coe-2025-xxxx
+    url: z.string().optional(),                   // رابط الدراسة لدى الناشر
+    keywords: z.array(z.string()).default([]),    // الكلمات المفتاحية للدراسة
   }),
 });
 

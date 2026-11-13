@@ -1,8 +1,8 @@
 ---
-import Base from "../layouts/Base.astro";
-import PageHead from "../components/PageHead.astro";
-import StudyCard from "../components/StudyCard.astro";
-import { getStudies, arCount } from "../data/utils";
+import Base from "../../layouts/Base.astro";
+import PageHead from "../../components/PageHead.astro";
+import StudyCard from "../../components/StudyCard.astro";
+import { getStudies, arCount } from "../../data/utils";
 const studies = await getStudies();
 const published = studies.filter((s) => s.data.status === "published");
 const inProgress = studies.filter((s) => s.data.status === "in-progress");

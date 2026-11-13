@@ -6,63 +6,26 @@ const { study } = Astro.props;
 const d = study.data;
 const meta = [d.journal, d.issue, d.year].filter(Boolean).join("، ");
 const published = d.status === "published";
+const href = `/studies/${study.id}/`;
+const en = d.lang === "en";
 ---
-<article class="group flex flex-col rounded-2xl bg-[var(--bg)] border border-[var(--rule)] overflow-hidden hover:shadow-[0_12px_32px_-12px_rgba(19,41,75,.25)] transition" data-pagefind-body>
+<article class="group relative flex flex-col rounded-2xl bg-[var(--bg)] border border-[var(--rule)] overflow-hidden hover:border-indigo/40 hover:shadow-[0_12px_32px_-12px_rgba(19,41,75,.25)] transition">
   <div class="relative p-5 pb-0 bg-[var(--bg-2)]">
     <StudyCover id={study.id} title={d.title} type={d.type} year={d.year} image={d.cover}
       class="mx-auto w-[72%] aspect-[3/4] rounded-t-md shadow-[0_-2px_24px_-6px_rgba(0,0,0,.35)] group-hover:-translate-y-1 transition-transform duration-300" />
     <span class:list={["absolute top-4 start-4 text-[0.78rem] font-medium px-2.5 py-0.5 rounded-full",
       published ? "bg-glass-green text-white" : "bg-saffron text-ink"]}>{published ? d.type : "قيد الإنجاز"}</span>
+    {en && <span class="absolute top-4 end-4 text-[0.75rem] font-medium px-2 py-0.5 rounded-full bg-indigo text-white">English</span>}
   </div>
   <div class="flex flex-col flex-1 p-6">
-    <h3 class="text-[1.15rem] leading-[1.7]">{d.title}</h3>
+    <h3 class="text-[1.15rem] leading-[1.7]" dir={en ? "ltr" : undefined} lang={en ? "en" : undefined}>
+      <a href={href} class="no-underline after:absolute after:inset-0 group-hover:text-indigo dark:group-hover:text-saffron">{d.title}</a>
+    </h3>
     {meta && <p class="mt-1 text-[0.9rem] text-[var(--muted)]">{meta}</p>}
-    <p class="mt-3 text-[0.97rem] leading-[1.9] text-[var(--muted)]">{d.summary}</p>
-    <div class="mt-auto pt-6" data-pagefind-ignore>
-      {d.pdf ? (
-        <div class="flex items-stretch gap-2">
-          <a href={d.pdf} download data-dl={study.id} class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo text-white font-medium no-underline hover:bg-indigo-deep dark:bg-saffron dark:text-ink transition-colors">
-            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-            تنزيل الدراسة{d.pages ? ` · ${d.pages} صفحة` : ""}
-          </a>
-          <span class="shrink-0 min-w-[5.5rem] flex flex-col items-center justify-center px-3 rounded-xl border border-[var(--rule)] leading-tight" title="عدد مرات التنزيل">
-            <span data-count={study.id} class="text-[1.05rem] font-bold tabular-nums">…</span>
-            <span class="text-[0.75rem] text-[var(--muted)]">تنزيل</span>
-          </span>
-        </div>
-      ) : (
-        <span class="flex items-center justify-center w-full py-3 rounded-xl border border-dashed border-[var(--rule)] text-[var(--muted)] text-[0.95rem]">
-          {published ? "ملف الدراسة يُضاف قريبًا" : "تُتاح للتنزيل بعد نشرها"}
-        </span>
-      )}
-    </div>
+    <p class="mt-3 text-[0.97rem] leading-[1.9] text-[var(--muted)] line-clamp-3">{d.summary}</p>
+    <span class="mt-auto pt-6 flex items-center justify-between text-[0.95rem] font-medium text-indigo dark:text-saffron">
+      <span>الملخص والتنزيل</span>
+      <svg viewBox="0 0 24 24" class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </span>
   </div>
 </article>
-
-<script>
-  // عدّاد التنزيلات: خدمة Abacus المجانية. يُحسب التنزيل مرة واحدة لكل متصفح لكل دراسة
-  const API = "https://abacus.jasoncameron.dev";
-  const NS = "almaljamie.my";
-  const key = (id: string) => `download-${id}`;
-  const fmt = (n: number) => n.toLocaleString("ar-u-nu-latn");
-
-  document.querySelectorAll<HTMLElement>("[data-count]").forEach(async (el) => {
-    const id = el.dataset.count!;
-    try {
-      const r = await fetch(`${API}/get/${NS}/${key(id)}`);
-      el.textContent = r.ok ? fmt((await r.json()).value ?? 0) : "0";
-    } catch { el.textContent = "–"; }
-  });
-
-  document.querySelectorAll<HTMLAnchorElement>("[data-dl]").forEach((a) => {
-    a.addEventListener("click", () => {
-      const id = a.dataset.dl!;
-      const seen = `dl:${id}`;
-      try { if (localStorage.getItem(seen)) return; localStorage.setItem(seen, "1"); } catch {}
-      fetch(`${API}/hit/${NS}/${key(id)}`, { keepalive: true })
-        .then((r) => r.json())
-        .then((j) => document.querySelectorAll<HTMLElement>(`[data-count="${id}"]`).forEach((el) => (el.textContent = fmt(j.value))))
-        .catch(() => {});
-    });
-  });
-</script>

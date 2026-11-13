@@ -1,6 +1,6 @@
 ---
-interface Props { url: string; title: string }
-const { url, title } = Astro.props;
+interface Props { url: string; title: string; label?: string }
+const { url, title, label = "شارك المقال" } = Astro.props;
 const u = encodeURIComponent(url);
 const t = encodeURIComponent(title);
 const links = [
@@ -11,7 +11,7 @@ const links = [
 ];
 ---
 <div class="flex flex-wrap items-center gap-2 font-display">
-  <span class="text-[var(--muted)] ms-0 me-1">شارك المقال</span>
+  <span class="text-[var(--muted)] ms-0 me-1">{label}</span>
   {links.map((l) => (
     <a href={l.href} target="_blank" rel="noopener" aria-label={`شارك على ${l.label}`} title={l.label}
        class="w-10 h-10 grid place-items-center rounded-full border border-[var(--rule)] hover:border-[var(--fg)] hover:bg-[var(--bg-2)] transition-colors">
