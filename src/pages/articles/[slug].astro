@@ -17,10 +17,26 @@ const { Content, headings } = await render(post);
 const d = post.data;
 const toc = headings.filter((h) => h.depth === 2);
 const url = new URL(`/articles/${post.id}/`, site.url).href;
-const related = all.filter((p) => p.id !== post.id && p.data.category === d.category).slice(0, 3);
+// السلسلة: مقالاتها مرتبة من الأقدم إلى الأحدث
+const series = d.series ? all.filter((p) => p.data.series === d.series).sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf()) : [];
+const sIdx = series.findIndex((p) => p.id === post.id);
+const sPrev = sIdx > 0 ? series[sIdx - 1] : undefined;
+const sNext = sIdx >= 0 && sIdx < series.length - 1 ? series[sIdx + 1] : undefined;
+const related = all.filter((p) => p.id !== post.id && p.data.category === d.category && !(d.series && p.data.series === d.series)).slice(0, 3);
 ---
 <Base title={d.title} description={d.summary} type="article" image={d.cover} keywords={d.tags}>
   <div id="progress" class="fixed top-0 inset-x-0 h-[3px] bg-saffron z-50" aria-hidden="true"></div>
+
+  <!-- أداة حجم خط القراءة: كل نقرة تصغّر الخط أو تكبّره درجة -->
+  <div class="fixed bottom-5 start-5 z-40 flex items-center gap-1 rounded-full bg-[var(--bg)] border border-[var(--rule)] shadow-[0_8px_24px_-8px_rgba(19,41,75,.35)] p-1 print:hidden" role="group" aria-label="حجم خط القراءة" data-pagefind-ignore>
+    <button type="button" id="font-down" class="w-10 h-10 grid place-items-center rounded-full hover:bg-[var(--bg-2)] disabled:opacity-35 disabled:cursor-not-allowed" aria-label="تصغير الخط" title="تصغير الخط">
+      <span class="font-[family-name:var(--font-read)] text-[0.95rem] leading-none">ع</span>
+    </button>
+    <span id="font-level" class="min-w-[3.2rem] text-center text-[0.85rem] text-[var(--muted)] tabular-nums" aria-live="polite">100%</span>
+    <button type="button" id="font-up" class="w-10 h-10 grid place-items-center rounded-full hover:bg-[var(--bg-2)] disabled:opacity-35 disabled:cursor-not-allowed" aria-label="تكبير الخط" title="تكبير الخط">
+      <span class="font-[family-name:var(--font-read)] text-[1.6rem] leading-none">ع</span>
+    </button>
+  </div>
 
   <article data-pagefind-body>
     <header class="mx-auto max-w-4xl px-5 sm:px-8 pt-12 md:pt-16 text-center">
@@ -59,6 +75,24 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
         )}
       </aside>
       <div class="article prose min-w-0">
+        {series.length > 1 && (
+          <details class="not-prose mb-10 rounded-2xl border border-[var(--rule)] bg-[var(--bg-2)] font-[family-name:var(--font-display)] text-[1rem]" data-pagefind-ignore>
+            <summary class="cursor-pointer list-none flex items-center justify-between gap-3 p-5">
+              <span><span class="text-[var(--muted)]">سلسلة: </span><strong>{d.series}</strong></span>
+              <span class="text-[0.9rem] text-[var(--muted)]">المقال {sIdx + 1} من {series.length}</span>
+            </summary>
+            <ol class="px-5 pb-5 space-y-1">
+              {series.map((p, i) => (
+                <li class="flex gap-3 items-baseline">
+                  <span class:list={["shrink-0 w-6 h-6 grid place-items-center rounded-full text-[0.8rem]", i === sIdx ? "bg-indigo text-white dark:bg-saffron dark:text-ink" : "bg-[var(--bg)] text-[var(--muted)] border border-[var(--rule)]"]}>{i + 1}</span>
+                  {i === sIdx
+                    ? <span class="font-bold">{p.data.title}</span>
+                    : <a href={`/articles/${p.id}/`} class="no-underline hover:text-indigo dark:hover:text-saffron">{p.data.title}</a>}
+                </li>
+              ))}
+            </ol>
+          </details>
+        )}
         <Content />
       </div>
       <div></div>
@@ -82,6 +116,22 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
         </div>
       </div>
 
+      {series.length > 1 && (
+        <nav class="mt-10 grid sm:grid-cols-2 gap-4" aria-label={`مقالات سلسلة ${d.series}`}>
+          {sPrev ? (
+            <a href={`/articles/${sPrev.id}/`} class="no-underline rounded-xl border border-[var(--rule)] hover:border-indigo p-5 transition-colors">
+              <span class="block text-sm text-[var(--muted)]">الجزء السابق من السلسلة</span>
+              <span class="block mt-1 text-[1.1rem] leading-relaxed">{sPrev.data.title}</span>
+            </a>
+          ) : <span class="hidden sm:block"></span>}
+          {sNext && (
+            <a href={`/articles/${sNext.id}/`} class="no-underline rounded-xl bg-indigo text-white dark:bg-saffron dark:text-ink p-5 sm:text-left">
+              <span class="block text-sm opacity-75">الجزء التالي من السلسلة</span>
+              <span class="block mt-1 text-[1.1rem] leading-relaxed">{sNext.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )}
       <nav class="mt-10 grid sm:grid-cols-2 gap-4 font-display" aria-label="مقالات أخرى">
         {newer ? (
           <a href={`/articles/${newer.id}/`} class="no-underline rounded-xl border border-[var(--rule)] hover:border-[var(--fg)] p-5 transition-colors">
@@ -109,6 +159,27 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
   )}
 
   <script>
+    // حجم خط القراءة: من 80% إلى 170% بخطوة 10% لكل نقرة، ويُحفظ لزيارات القارئ القادمة
+    const art = document.querySelector(".article") as HTMLElement;
+    const base = parseFloat(getComputedStyle(art).fontSize);
+    const MIN = 0.8, MAX = 1.7, STEP = 0.1;
+    let scale = 1;
+    try { scale = Math.min(MAX, Math.max(MIN, parseFloat(localStorage.getItem("fontScale") || "1") || 1)); } catch {}
+    const down = document.getElementById("font-down") as HTMLButtonElement;
+    const up = document.getElementById("font-up") as HTMLButtonElement;
+    const level = document.getElementById("font-level")!;
+    const apply = () => {
+      art.style.fontSize = `${(base * scale).toFixed(2)}px`;
+      level.textContent = `${Math.round(scale * 100)}%`;
+      down.disabled = scale <= MIN + 0.001;
+      up.disabled = scale >= MAX - 0.001;
+      try { localStorage.setItem("fontScale", String(scale)); } catch {}
+    };
+    down.addEventListener("click", () => { scale = Math.max(MIN, +(scale - STEP).toFixed(2)); apply(); });
+    up.addEventListener("click", () => { scale = Math.min(MAX, +(scale + STEP).toFixed(2)); apply(); });
+    level.addEventListener("click", () => { scale = 1; apply(); });
+    apply();
+
     const bar = document.getElementById("progress")!;
     const article = document.querySelector(".article") as HTMLElement;
     const onScroll = () => {

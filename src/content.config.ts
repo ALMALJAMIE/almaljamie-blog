@@ -16,6 +16,7 @@ const posts = defineCollection({
     sourceUrl: z.string().optional(),
     cover: z.string().optional(),
     tags: z.array(z.string()).default([]),   // كلمات مفتاحية
+    series: z.string().optional(),            // اسم السلسلة: مقالاتها تُرتب حسب التاريخ وتُربط ببعضها
     draft: z.boolean().default(false),
   }),
 });
