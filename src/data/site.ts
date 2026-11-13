@@ -9,10 +9,10 @@ export const site = {
   email: "",
   phone: "",
   whatsapp: "",   // رقم بصيغة دولية دون + مثل 60123456789
-  facebook: "",
-  x: "",
+  facebook: "https://www.facebook.com/Almaljamie/",
+  x: "https://x.com/ALMALJAMIE",
   telegram: "",
-  instagram: "",
+  instagram: "https://www.instagram.com/a.abbbas.m/",
   youtube: "",
   googleScholar: "",
   researchgate: "",
