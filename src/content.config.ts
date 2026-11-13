@@ -15,6 +15,7 @@ const posts = defineCollection({
     source: z.string().optional(),
     sourceUrl: z.string().optional(),
     cover: z.string().optional(),
+    tags: z.array(z.string()).default([]),   // كلمات مفتاحية
     draft: z.boolean().default(false),
   }),
 });

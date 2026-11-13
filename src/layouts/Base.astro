@@ -7,8 +7,9 @@ interface Props {
   description?: string;
   type?: "website" | "article";
   image?: string;
+  keywords?: string[];
 }
-const { title, description = site.description, type = "website", image = "/images/author.jpg" } = Astro.props;
+const { title, description = site.description, type = "website", image = "/images/author.jpg", keywords = [] } = Astro.props;
 const fullTitle = title ? `${title} | ${site.title}` : `${site.title} | ${site.tagline}`;
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const path = Astro.url.pathname;
@@ -22,6 +23,7 @@ const socials = activeSocials();
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
+  {keywords.length > 0 && <meta name="keywords" content={keywords.join("، ")} />}
   <link rel="canonical" href={canonical} />
   <meta property="og:title" content={title ?? site.title} />
   <meta property="og:description" content={description} />

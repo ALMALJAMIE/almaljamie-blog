@@ -38,3 +38,6 @@ export function arCount(n: number, one: string, two: string, few: string, many: 
   if (n >= 3 && n <= 10) return `${n} ${few}`;
   return `${n} ${many}`;
 }
+
+export const tagSlug = (t: string) => t.trim().replace(/\s+/g, "-");
+export const tagUrl = (t: string) => `/articles/tag/${tagSlug(t)}/`;

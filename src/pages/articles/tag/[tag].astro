@@ -1,0 +1,23 @@
+---
+import Base from "../../../layouts/Base.astro";
+import PageHead from "../../../components/PageHead.astro";
+import PostItem from "../../../components/PostItem.astro";
+import { getPosts, tagSlug, arCount, type Post } from "../../../data/utils";
+
+// صفحة لكل كلمة مفتاحية تجمع المقالات التي تحملها
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const tags = new Map<string, Post[]>();
+  posts.forEach((p) => p.data.tags.forEach((t) => tags.set(t, [...(tags.get(t) ?? []), p])));
+  return [...tags].map(([tag, list]) => ({ params: { tag: tagSlug(tag) }, props: { tag, list } }));
+}
+interface Props { tag: string; list: Post[] }
+const { tag, list } = Astro.props;
+---
+<Base title={`مقالات عن ${tag}`} description={`مقالات أحمد عباس الملجمي عن ${tag}.`} keywords={[tag]}>
+  <PageHead title={tag} crumb={`كلمة مفتاحية: ${tag}`} lead={`${arCount(list.length, "مقال واحد", "مقالان", "مقالات", "مقالًا")} بهذه الكلمة المفتاحية.`} />
+  <section class="mx-auto max-w-5xl px-5 sm:px-8 pt-6">
+    {list.map((p) => <PostItem post={p} />)}
+    <a href="/articles/" class="inline-block mt-8 font-medium text-indigo dark:text-saffron">كل المقالات</a>
+  </section>
+</Base>
