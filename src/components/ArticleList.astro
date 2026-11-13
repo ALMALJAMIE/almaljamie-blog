@@ -1,9 +1,14 @@
 ---
 import PostItem from "./PostItem.astro";
-import type { Post } from "../data/utils";
-interface Props { posts: Post[]; current: number; last: number; categories: string[] }
-const { posts, current, last, categories } = Astro.props;
+import { getPosts, catUrl, type Post } from "../data/utils";
+interface Props { posts: Post[]; current: number; last: number; categories: string[]; active?: string }
+const { posts, current, last, active } = Astro.props;
 const pageUrl = (n: number) => (n === 1 ? "/articles/" : `/articles/page/${n}/`);
+// التصنيفات مع عدد مقالات كل منها، مرتبة من الأكثر إلى الأقل
+const all = await getPosts();
+const counts = new Map<string, number>();
+all.forEach((p) => counts.set(p.data.category, (counts.get(p.data.category) ?? 0) + 1));
+const cats = [...counts].sort((a, b) => b[1] - a[1]);
 ---
 <div class="mx-auto max-w-7xl px-5 sm:px-8 pt-10 grid lg:grid-cols-[1fr_18rem] gap-12">
   <div>
@@ -25,8 +30,21 @@ const pageUrl = (n: number) => (n === 1 ? "/articles/" : `/articles/page/${n}/`)
   <aside class="space-y-6">
     <div class="rounded-2xl border border-[var(--rule)] p-6">
       <h2 class="text-[1.1rem]">التصنيفات</h2>
-      <ul class="mt-3 space-y-1">
-        {categories.map((c) => <li class="flex items-center gap-2 text-[var(--muted)] before:w-1.5 before:h-1.5 before:rounded-full before:bg-saffron">{c}</li>)}
+      <ul class="mt-3 -mx-2">
+        <li>
+          <a href="/articles/" class:list={["flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg no-underline", !active ? "bg-indigo/8 text-indigo font-bold dark:bg-white/10 dark:text-saffron" : "text-[var(--muted)] hover:bg-[var(--bg-2)] hover:text-[var(--fg)]"]}>
+            <span>كل المقالات</span><span class="text-[0.82rem] tabular-nums">{all.length}</span>
+          </a>
+        </li>
+        {cats.map(([c, n]) => (
+          <li>
+            <a href={catUrl(c)} aria-current={active === c ? "page" : undefined}
+               class:list={["flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg no-underline", active === c ? "bg-indigo/8 text-indigo font-bold dark:bg-white/10 dark:text-saffron" : "text-[var(--muted)] hover:bg-[var(--bg-2)] hover:text-[var(--fg)]"]}>
+              <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-saffron"></span>{c}</span>
+              <span class="text-[0.82rem] tabular-nums">{n}</span>
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
     <div class="rounded-2xl bg-indigo text-white p-6 relative overflow-hidden">

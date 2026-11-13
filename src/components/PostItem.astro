@@ -1,6 +1,6 @@
 ---
 import Cover from "./Cover.astro";
-import { arDate, readingTime, type Post } from "../data/utils";
+import { arDate, readingTime, catUrl, type Post } from "../data/utils";
 import { site } from "../data/site";
 interface Props { post: Post; variant?: "row" | "card" }
 const { post, variant = "row" } = Astro.props;
@@ -30,7 +30,7 @@ const d = post.data;
       <Cover id={post.id} category={d.category} image={d.cover} class="w-full aspect-[16/10] group-hover:scale-[1.03] transition-transform duration-500" />
     </a>
     <div>
-      <a href="/articles/" class="inline-block text-[0.82rem] font-medium px-2.5 py-0.5 rounded-full bg-indigo/8 text-indigo dark:bg-white/10 dark:text-saffron no-underline">{d.category}</a>
+      <a href={catUrl(d.category)} class="inline-block text-[0.82rem] font-medium px-2.5 py-0.5 rounded-full bg-indigo/8 text-indigo dark:bg-white/10 dark:text-saffron no-underline">{d.category}</a>
       <h2 class="mt-2 text-[1.45rem] sm:text-[1.6rem] leading-snug">
         <a href={href} class="no-underline group-hover:text-indigo dark:group-hover:text-saffron">{d.title}</a>
       </h2>

@@ -41,3 +41,4 @@ export function arCount(n: number, one: string, two: string, few: string, many: 
 
 export const tagSlug = (t: string) => t.trim().replace(/\s+/g, "-");
 export const tagUrl = (t: string) => `/articles/tag/${tagSlug(t)}/`;
+export const catUrl = (c: string) => `/articles/category/${tagSlug(c)}/`;
