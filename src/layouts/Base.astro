@@ -6,8 +6,9 @@ interface Props {
   title?: string;
   description?: string;
   type?: "website" | "article";
+  image?: string;
 }
-const { title, description = site.description, type = "website" } = Astro.props;
+const { title, description = site.description, type = "website", image = "/images/author.jpg" } = Astro.props;
 const fullTitle = title ? `${title} | ${site.title}` : `${site.title} | ${site.tagline}`;
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const path = Astro.url.pathname;
@@ -27,8 +28,8 @@ const socials = activeSocials();
   <meta property="og:type" content={type} />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="ar_AR" />
-  <meta property="og:image" content={new URL("/images/author.jpg", site.url).href} />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content={new URL(image, site.url).href} />
+  <meta name="twitter:card" content={type === "article" ? "summary_large_image" : "summary"} />
   <meta name="theme-color" content="#13294b" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate" type="application/rss+xml" title={site.title} href="/rss.xml" />
