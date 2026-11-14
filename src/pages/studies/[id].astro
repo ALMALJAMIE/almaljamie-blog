@@ -24,7 +24,7 @@ const url = new URL(`/studies/${study.id}/`, site.url).href;
 const facts = [
   { label: "النوع", value: published ? d.type : `${d.type} (قيد الإنجاز)` },
   { label: "جهة النشر", value: d.journal },
-  { label: "العدد والصفحات", value: d.issue },
+  { label: "بيانات العدد", value: d.issue },
   { label: "سنة النشر", value: d.year ? String(d.year) : undefined },
   { label: "اللغة", value: en ? "الإنجليزية" : "العربية" },
   { label: "عدد الصفحات", value: d.pages ? String(d.pages) : undefined },
