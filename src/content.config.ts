@@ -30,6 +30,8 @@ const studies = defineCollection({
     type: z.string().default("دراسة محكّمة"),     // دراسة محكّمة / رسالة ماجستير / ورقة بحثية...
     status: z.enum(["published", "in-progress"]).default("published"),
     journal: z.string().optional(),               // اسم المجلة أو الجامعة
+    publisher: z.string().optional(),             // الناشر إن اختلف عن المجلة
+    issn: z.string().optional(),
     issue: z.string().optional(),                 // المجلد والعدد
     year: z.number().optional(),
     summary: z.string(),
@@ -38,6 +40,7 @@ const studies = defineCollection({
     cover: z.string().optional(),
     order: z.number().default(0),                 // للترتيب: الأكبر أولًا
     lang: z.enum(["ar", "en"]).default("ar"),     // لغة الدراسة
+    authors: z.array(z.string()).default([]),    // المؤلفون إن كانت الدراسة مشتركة
     doi: z.string().optional(),                   // مثل: 10.33774/coe-2025-xxxx
     url: z.string().optional(),                   // رابط الدراسة لدى الناشر
     keywords: z.array(z.string()).default([]),    // الكلمات المفتاحية للدراسة

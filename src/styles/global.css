@@ -114,3 +114,6 @@ a { color: inherit; }
 .pattern {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='40' viewBox='0 0 64 40'%3E%3Cpath d='M0 40a32 32 0 0 1 64 0M12 40a20 20 0 0 1 40 0M24 40a8 8 0 0 1 16 0M32 8v32M9.4 17.4 32 40M54.6 17.4 32 40' fill='none' stroke='%23ffffff' stroke-opacity='.06' stroke-width='1.2'/%3E%3C/svg%3E");
 }
+
+/* النصوص الإنجليزية داخل المقال أو الملخص */
+.article:lang(en) { line-height: 1.75; font-family: "Amiri", Georgia, "Times New Roman", serif; }
