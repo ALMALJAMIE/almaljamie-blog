@@ -1,0 +1,32 @@
+---
+// روابط الملفات البحثية. variant: list = قائمة بالاسم (السيرة الذاتية)، footer = أيقونات صغيرة (التذييل)
+import { researchProfiles } from "../data/site";
+interface Props { variant?: "list" | "footer" }
+const { variant = "list" } = Astro.props;
+---
+{variant === "list" ? (
+  <ul class="space-y-1">
+    {researchProfiles.map((r) => (
+      <li>
+        <a href={r.href} target="_blank" rel="noopener me" class="group flex items-center gap-3 py-1.5 no-underline hover:text-indigo dark:hover:text-saffron">
+          <span class="grid place-items-center w-9 h-9 shrink-0 rounded-full bg-indigo/8 text-indigo dark:bg-white/10 dark:text-saffron group-hover:bg-indigo group-hover:text-white transition-colors">
+            {r.icon
+              ? <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor" aria-hidden="true"><path d={r.icon} /></svg>
+              : <span class="font-bold text-[0.9rem] leading-none" aria-hidden="true">{r.letter}</span>}
+          </span>
+          <span class="font-medium">{r.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+) : (
+  <div class="flex flex-wrap gap-2">
+    {researchProfiles.map((r) => (
+      <a href={r.href} target="_blank" rel="noopener me" title={r.label} aria-label={`ملفي في ${r.label}`} class="grid place-items-center w-10 h-10 rounded-full bg-white/10 no-underline hover:bg-saffron hover:text-ink transition-colors">
+        {r.icon
+          ? <svg viewBox="0 0 24 24" class="w-[18px] h-[18px]" fill="currentColor" aria-hidden="true"><path d={r.icon} /></svg>
+          : <span class="font-bold text-[0.95rem] leading-none" aria-hidden="true">{r.letter}</span>}
+      </a>
+    ))}
+  </div>
+)}
