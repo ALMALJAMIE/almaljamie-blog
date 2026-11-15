@@ -1,0 +1,9 @@
+---
+// عدّاد ظاهر: قراءات المقال أو مشاهدات الفيديو. يُملأ بالسكربت المشترك في Base.astro
+interface Props { stat: string; kind?: "read" | "watch"; hit?: boolean; class?: string }
+const { stat, kind = "read", hit = false, class: cls = "" } = Astro.props;
+---
+<span data-stat={stat} data-kind={kind} data-hit={hit ? "1" : undefined} class={`hidden items-center gap-1.5 ${cls}`} title={kind === "watch" ? "عدد المشاهدات" : "عدد القراءات"}>
+  <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+  <span data-stat-n></span>
+</span>

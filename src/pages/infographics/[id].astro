@@ -7,6 +7,7 @@ import DownloadButton from "../../components/DownloadButton.astro";
 import Share from "../../components/Share.astro";
 import ArchiveCard from "../../components/ArchiveCard.astro";
 import VideoEmbed from "../../components/VideoEmbed.astro";
+import ViewCount from "../../components/ViewCount.astro";
 import { site } from "../../data/site";
 
 export async function getStaticPaths() {
@@ -83,7 +84,7 @@ const desc = d.summary ?? `${d.docType ?? d.kind}${d.place ? ` عن ${d.place}` 
         <div class="mt-10" data-pagefind-ignore>
           <h2 class="text-[1.6rem]">شاهد الفيديو</h2>
           <VideoEmbed id={v.data.youtube!} title={v.data.title} poster={v.data.image} class="mt-5 rounded-2xl" />
-          {v.data.duration && <p class="mt-2 text-[0.9rem] text-[var(--muted)]">{v.data.duration}</p>}
+          <p class="mt-2 text-[0.9rem] text-[var(--muted)] flex flex-wrap gap-x-4">{v.data.duration && <span>{v.data.duration}</span>}<ViewCount stat={`play-${v.data.youtube}`} kind="watch" /></p>
         </div>
       ))}
       <div class="mt-10 pt-8 border-t border-[var(--rule)]" data-pagefind-ignore>

@@ -1,0 +1,31 @@
+---
+// بطاقة تعريف بالأرشيف، تملأ الفراغ في آخر شبكة الدراسات
+import { getCollection } from "astro:content";
+const all = await getCollection("infographics");
+const docs = all.filter((i) => i.data.pdf).length;
+const videos = all.filter((i) => i.data.youtube).length;
+const cover = all.find((i) => i.data.pdf && i.data.image)?.data.image;
+const parts = [docs && (docs === 1 ? "وثيقة واحدة" : `${docs} وثائق`), videos && (videos === 1 ? "فيديو واحد" : `${videos} فيديوهات`)].filter(Boolean).join(" و");
+---
+{(docs > 0 || videos > 0) && (
+  <a href="/infographics/" class="group relative flex flex-col rounded-2xl bg-indigo text-white overflow-hidden no-underline hover:shadow-[0_12px_32px_-12px_rgba(19,41,75,.45)] transition">
+    <div class="absolute inset-0 pattern"></div>
+    {cover && (
+      <div class="relative p-5 pb-0">
+        <img src={cover} alt="" loading="lazy" class="w-full h-auto rounded-md opacity-90 group-hover:opacity-100 group-hover:-translate-y-1 transition duration-300 shadow-[0_8px_24px_-8px_rgba(0,0,0,.5)]" />
+      </div>
+    )}
+    <div class="relative flex flex-col flex-1 p-6">
+      <p class="text-saffron text-[0.9rem] font-medium">من الأرشيف</p>
+      <h3 class="mt-1 text-[1.35rem] leading-[1.6] text-white">أرشيف الإنفوجرافيك</h3>
+      <p class="mt-3 text-[0.97rem] leading-[1.9] text-white/75">وثائق وتصاميم توضيحية رافقت المقالات والدراسات، متاحة للاطلاع والتنزيل.</p>
+      {parts && <p class="mt-3 text-[0.9rem] text-white/60">فيه الآن {parts}.</p>}
+      <span class="mt-auto pt-6">
+        <span class="flex items-center justify-center gap-2 py-3 rounded-xl bg-saffron text-ink font-medium group-hover:bg-white transition-colors">
+          ادخل الأرشيف
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </span>
+      </span>
+    </div>
+  </a>
+)}

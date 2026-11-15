@@ -23,6 +23,7 @@ const { id, title, poster, class: cls = "" } = Astro.props;
       f.allowFullscreen = true;
       f.className = "absolute inset-0 w-full h-full";
       box.replaceChildren(f);
+      (window as any).statHit?.(`play-${box.dataset.yt}`);
     });
   });
 </script>

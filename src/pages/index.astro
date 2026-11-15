@@ -3,11 +3,14 @@ import Base from "../layouts/Base.astro";
 import PostItem from "../components/PostItem.astro";
 import StudyCard from "../components/StudyCard.astro";
 import Portrait from "../components/Portrait.astro";
+import ArchiveFeature from "../components/ArchiveFeature.astro";
+import { getCollection } from "astro:content";
 import { getPosts, getStudies, arCount } from "../data/utils";
 import { notebook } from "../data/site";
 
 const posts = await getPosts();
 const studies = await getStudies();
+const archiveCount = (await getCollection("infographics")).filter((i) => i.data.pdf || i.data.youtube).length;
 
 const sections = [
   { href: "/articles/", title: "المقالات", text: "مقالات رأي وتحليل في الشأن اليمني، وفي محافظة البيضاء خاصة.", count: arCount(posts.length, "مقال واحد", "مقالان", "مقالات", "مقالًا"),
@@ -106,6 +109,20 @@ const sections = [
           {studies.slice(0, 3).map((s) => <StudyCard study={s} />)}
         </div>
       </div>
+    </section>
+  )}
+
+  <!-- أرشيف الإنفوجرافيك -->
+  {archiveCount > 0 && (
+    <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-24">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 class="text-[2rem]">أرشيف الإنفوجرافيك</h2>
+          <p class="mt-1 text-[var(--muted)]">وثائق وتصاميم توضيحية رافقت المقالات والدراسات.</p>
+        </div>
+        <a href="/infographics/" class="font-medium text-indigo dark:text-saffron">كل الأرشيف</a>
+      </div>
+      <ArchiveFeature limit={1} class="mt-6" />
     </section>
   )}
 

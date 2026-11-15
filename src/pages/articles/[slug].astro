@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import Cover from "../../components/Cover.astro";
 import Share from "../../components/Share.astro";
 import PostItem from "../../components/PostItem.astro";
+import ViewCount from "../../components/ViewCount.astro";
 import { getPosts, arDate, readingTime, tagUrl, catUrl, type Post } from "../../data/utils";
 import { site } from "../../data/site";
 
@@ -47,10 +48,7 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
         <span>{site.title}</span>
         <time datetime={d.date.toISOString()}>{arDate(d.date)}</time>
         <span>{readingTime(post.body)}</span>
-        <span data-views={post.id} class="hidden items-center gap-1.5" title="عدد القراءات">
-          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-          <span data-views-n></span>
-        </span>
+        <ViewCount stat={`view-${post.id}`} hit />
       </div>
       {d.source && (
         <p class="mt-2 text-[1rem] text-[var(--muted)]">
@@ -210,31 +208,4 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
       document.querySelectorAll(".article h2[id]").forEach((h) => io.observe(h));
     }
   </script>
-<script>
-  // عدد قراءات المقال: يُحسب مرة واحدة لكل متصفح لكل مقال (خدمة Abacus نفسها التي تعدّ التنزيلات)
-  const API = "https://abacus.jasoncameron.dev";
-  const NS = "almaljamie.my";
-  const word = (n: number) => {
-    const f = n.toLocaleString("ar-u-nu-latn");
-    if (n === 1) return "قراءة واحدة";
-    if (n === 2) return "قراءتان";
-    const h = n % 100;
-    return h >= 3 && h <= 10 ? `${f} قراءات` : `${f} قراءة`;
-  };
-  const box = document.querySelector<HTMLElement>("[data-views]");
-  if (box) {
-    const id = box.dataset.views!;
-    const seen = `view:${id}`;
-    let first = false;
-    try { first = !localStorage.getItem(seen); if (first) localStorage.setItem(seen, "1"); } catch {}
-    fetch(`${API}/${first ? "hit" : "get"}/${NS}/view-${id}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => {
-        if (!j || !j.value) return;
-        box.querySelector("[data-views-n]")!.textContent = word(j.value);
-        box.classList.replace("hidden", "inline-flex");
-      })
-      .catch(() => {});
-  }
-</script>
 </Base>

@@ -198,5 +198,42 @@ const socials = activeSocials();
       }
     });
   </script>
+  <script>
+    // العدّادات الظاهرة (قراءات المقالات ومشاهدات الفيديو) عبر خدمة Abacus
+    // تُحسب القراءة أو المشاهدة مرة واحدة لكل متصفح
+    const API = "https://abacus.jasoncameron.dev";
+    const NS = "almaljamie.my";
+    const forms: Record<string, string[]> = {
+      read: ["قراءة واحدة", "قراءتان", "قراءات", "قراءة"],
+      watch: ["مشاهدة واحدة", "مشاهدتان", "مشاهدات", "مشاهدة"],
+    };
+    const word = (n: number, kind: string) => {
+      const [one, two, few, many] = forms[kind] ?? forms.read;
+      const f = n.toLocaleString("ar-u-nu-latn");
+      if (n === 1) return one;
+      if (n === 2) return two;
+      const h = n % 100;
+      return h >= 3 && h <= 10 ? `${f} ${few}` : `${f} ${many}`;
+    };
+    const show = (key: string, value: number) => {
+      if (!value) return;
+      document.querySelectorAll<HTMLElement>(`[data-stat="${key}"]`).forEach((el) => {
+        el.querySelector("[data-stat-n]")!.textContent = word(value, el.dataset.kind ?? "read");
+        el.classList.replace("hidden", "inline-flex");
+      });
+    };
+    const firstTime = (key: string) => {
+      try { if (localStorage.getItem(`stat:${key}`)) return false; localStorage.setItem(`stat:${key}`, "1"); return true; } catch { return false; }
+    };
+    const call = (op: string, key: string) =>
+      fetch(`${API}/${op}/${NS}/${key}`, { keepalive: op === "hit" })
+        .then((r) => (r.ok ? r.json() : null)).then((j) => j && show(key, j.value)).catch(() => {});
+    (window as any).statHit = (key: string) => { if (firstTime(key)) call("hit", key); };
+    const keys = new Map<string, boolean>();
+    document.querySelectorAll<HTMLElement>("[data-stat]").forEach((el) => {
+      keys.set(el.dataset.stat!, keys.get(el.dataset.stat!) || el.dataset.hit === "1");
+    });
+    keys.forEach((hit, key) => call(hit && firstTime(key) ? "hit" : "get", key));
+  </script>
 </body>
 </html>
