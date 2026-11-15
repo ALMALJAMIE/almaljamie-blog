@@ -47,4 +47,16 @@ const studies = defineCollection({
   }),
 });
 
-export const collections = { posts, studies };
+// أرشيف الإنفوجرافيك: الصورة في public/infographics/ وملف وصف في src/content/infographics/
+const infographics = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/infographics", generateId: slugFromFile }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    image: z.string(),                 // مثل: /infographics/bayda-key.jpg
+    article: z.string().optional(),    // معرّف المقال المرتبط، مثل: bayda-key
+    category: z.string().optional(),
+  }),
+});
+
+export const collections = { posts, studies, infographics };

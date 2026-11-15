@@ -24,6 +24,7 @@ export const nav = [
   { href: "/cv/", label: "السيرة الذاتية" },
   { href: "/articles/", label: "المقالات" },
   { href: "/studies/", label: "الدراسات المنشورة" },
+  { href: "/infographics/", label: "أرشيف الإنفوجرافيك" },
 ];
 export const notebook = { href: "/notebook/", label: "مفكرة الباحث الذكية" };
 
