@@ -6,7 +6,7 @@ import Portrait from "../components/Portrait.astro";
 import ArchiveFeature from "../components/ArchiveFeature.astro";
 import { getCollection } from "astro:content";
 import { getPosts, getStudies, arCount } from "../data/utils";
-import { notebook } from "../data/site";
+import { notebook, researchProfiles } from "../data/site";
 
 const posts = await getPosts();
 const studies = await getStudies();
@@ -43,6 +43,18 @@ const sections = [
         <div class="mt-9 flex flex-wrap gap-3">
           <a href="/articles/" class="no-underline px-6 py-3 rounded-full bg-saffron text-ink font-bold hover:bg-white transition-colors">اقرأ المقالات</a>
           <a href="/studies/" class="no-underline px-6 py-3 rounded-full border border-white/30 hover:bg-white/10 transition-colors">حمّل الدراسات</a>
+        </div>
+        <div class="mt-8 flex flex-wrap items-center gap-2.5">
+          <span class="text-white/60 text-[0.92rem] me-1">ملفاتي البحثية:</span>
+          {researchProfiles.map((r) => (
+            <a href={r.href} target="_blank" rel="noopener me" title={r.label} aria-label={`ملفي في ${r.label}`}
+              class="group/r relative grid place-items-center w-10 h-10 rounded-full border border-white/20 bg-white/5 text-white/80 no-underline hover:bg-white hover:text-indigo hover:border-white transition-colors">
+              {r.icon
+                ? <svg viewBox="0 0 24 24" class="w-[18px] h-[18px]" fill="currentColor" aria-hidden="true"><path d={r.icon} /></svg>
+                : <span class="font-bold text-[1rem] leading-none" aria-hidden="true">{r.letter}</span>}
+              <span class="pointer-events-none absolute top-full mt-2 whitespace-nowrap rounded-md bg-ink/90 px-2 py-1 text-[0.78rem] text-white opacity-0 group-hover/r:opacity-100 group-focus-visible/r:opacity-100 transition-opacity">{r.label}</span>
+            </a>
+          ))}
         </div>
       </div>
 
