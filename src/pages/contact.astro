@@ -1,13 +1,12 @@
 ---
 import Base from "../layouts/Base.astro";
 import PageHead from "../components/PageHead.astro";
+import ResearchLinks from "../components/ResearchLinks.astro";
 import { site, activeSocials } from "../data/site";
 const direct = [
   { label: "البريد الإلكتروني", value: site.email, href: site.email && `mailto:${site.email}` },
   { label: "واتساب", value: site.whatsapp && `+${site.whatsapp}`, href: site.whatsapp && `https://wa.me/${site.whatsapp}` },
   { label: "الهاتف", value: site.phone, href: site.phone && `tel:${site.phone.replace(/\s/g, "")}` },
-  { label: "الباحث العلمي من Google", value: site.googleScholar && "Google Scholar", href: site.googleScholar },
-  { label: "ResearchGate", value: site.researchgate && "ResearchGate", href: site.researchgate },
 ].filter((i) => i.href);
 const socials = activeSocials();
 ---
@@ -33,6 +32,8 @@ const socials = activeSocials();
             ))}
           </div>
         )}
+        <h2 class="mt-12 text-[1.3rem]">ملفاتي البحثية</h2>
+        <div class="mt-4"><ResearchLinks /></div>
       </>
     ) : (
       <p class="text-[var(--muted)] text-[1.05rem]">وسائل التواصل تُضاف قريبًا.</p>

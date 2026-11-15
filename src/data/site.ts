@@ -7,7 +7,7 @@ export const site = {
     "الموقع الرسمي للباحث اليمني أحمد عباس الملجمي: مقالات ودراسات في المجتمع اليمني وذهنيته وتحولاته.",
   url: "https://almaljamie.my",
   // الحقول الفارغة لا تظهر في الموقع
-  email: "",
+  email: "almaljamie@gmail.com",
   phone: "",
   whatsapp: "",   // رقم بصيغة دولية دون + مثل 60123456789
   facebook: "https://www.facebook.com/Almaljamie/",
