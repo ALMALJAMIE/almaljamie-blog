@@ -1,0 +1,29 @@
+# يرسل بريدًا لمشتركي النشرة عند إضافة مقال أو دراسة جديدة
+# لإيقاف الإرسال لتحديث معيّن: اكتب [no-email] في رسالة الـ commit
+name: إشعار المشتركين
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/content/posts/**", "src/content/studies/**"]
+
+concurrency:
+  group: notify
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    if: ${{ !contains(github.event.head_commit.message, '[no-email]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node scripts/notify-subscribers.mjs
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
