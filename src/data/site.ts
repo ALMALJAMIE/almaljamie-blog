@@ -8,6 +8,7 @@ export const site = {
   url: "https://almaljamie.my",
   // الحقول الفارغة لا تظهر في الموقع
   email: "almaljamie@gmail.com",
+  newsletter: "almaljamie",   // اسم المستخدم في Buttondown لنموذج الاشتراك بالبريد؛ اتركه فارغًا لإخفاء النموذج
   phone: "",
   whatsapp: "",   // رقم بصيغة دولية دون + مثل 60123456789
   facebook: "https://www.facebook.com/Almaljamie/",

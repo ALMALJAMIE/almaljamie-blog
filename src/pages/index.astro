@@ -4,6 +4,7 @@ import PostItem from "../components/PostItem.astro";
 import StudyCard from "../components/StudyCard.astro";
 import Portrait from "../components/Portrait.astro";
 import ArchiveFeature from "../components/ArchiveFeature.astro";
+import Subscribe from "../components/Subscribe.astro";
 import { getCollection } from "astro:content";
 import { getPosts, getStudies, arCount } from "../data/utils";
 import { notebook, researchProfiles } from "../data/site";
@@ -137,6 +138,9 @@ const sections = [
       <ArchiveFeature limit={1} class="mt-6" />
     </section>
   )}
+
+  <!-- الاشتراك بالبريد -->
+  <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-24"><Subscribe variant="band" /></section>
 
   <!-- دعوة ختامية -->
   <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-24">

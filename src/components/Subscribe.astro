@@ -1,0 +1,39 @@
+---
+// نموذج الاشتراك بالبريد (Buttondown). variant: band = قسم كبير، inline = مربع في آخر المقال
+import { site } from "../data/site";
+interface Props { variant?: "band" | "inline"; class?: string }
+const { variant = "inline", class: cls = "" } = Astro.props;
+const action = `https://buttondown.com/api/emails/embed-subscribe/${site.newsletter}`;
+const band = variant === "band";
+---
+{site.newsletter && (
+  <div class:list={[cls, band ? "relative overflow-hidden rounded-3xl bg-[var(--bg-2)] border border-[var(--rule)] px-6 py-12 md:px-14" : "rounded-xl border border-[var(--rule)] p-6"]} data-pagefind-ignore>
+    <div class:list={[band ? "grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-8 items-center" : ""]}>
+      <div>
+        <h2 class:list={[band ? "text-[1.8rem] sm:text-[2rem]" : "text-[1.25rem]"]}>{band ? "تصلك المقالات الجديدة على بريدك" : "هل تريد أن يصلك المقال القادم؟"}</h2>
+        <p class="mt-2 text-[var(--muted)] leading-[1.9]">
+          {band ? "رسالة واحدة عند نشر مقال أو دراسة جديدة. لا شيء غير ذلك، ويمكنك إلغاء الاشتراك متى شئت." : "اكتب بريدك وتصلك رسالة عند نشر مقال أو دراسة جديدة."}
+        </p>
+      </div>
+      <form action={action} method="post" target="_blank" class:list={["flex flex-col sm:flex-row gap-3", band ? "" : "mt-4"]} data-subscribe>
+        <label for={`sub-${variant}`} class="sr-only">بريدك الإلكتروني</label>
+        <input id={`sub-${variant}`} type="email" name="email" required placeholder="بريدك الإلكتروني" dir="ltr" autocomplete="email"
+          class="flex-1 min-w-0 px-4 py-3 rounded-xl border border-[var(--rule)] bg-[var(--bg)] text-end placeholder:text-end focus:outline-none focus:border-indigo dark:focus:border-saffron" />
+        <input type="hidden" name="embed" value="1" />
+        <input type="hidden" name="tag" value={band ? "home" : "article"} />
+        <button type="submit" class="px-6 py-3 rounded-xl bg-indigo text-white font-bold hover:bg-saffron hover:text-ink transition-colors">اشترك</button>
+      </form>
+    </div>
+    <p class="mt-3 text-[0.88rem] text-[var(--muted)] hidden" data-subscribe-done>شكرًا لك. أرسلنا إلى بريدك رسالة تأكيد، اضغط الرابط الذي فيها ليكتمل اشتراكك.</p>
+  </div>
+)}
+<script>
+  document.querySelectorAll<HTMLFormElement>("[data-subscribe]").forEach((f) =>
+    f.addEventListener("submit", () => {
+      setTimeout(() => {
+        f.closest("div")?.parentElement?.querySelector("[data-subscribe-done]")?.classList.remove("hidden");
+        f.reset();
+      }, 300);
+    })
+  );
+</script>
