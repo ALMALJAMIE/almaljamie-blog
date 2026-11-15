@@ -27,13 +27,29 @@ const { id, pdf, pages, published, label = "تنزيل الدراسة" } = Astro
   const key = (id: string) => `download-${id}`;
   const fmt = (n: number) => n.toLocaleString("ar-u-nu-latn");
 
-  document.querySelectorAll<HTMLElement>("[data-count]").forEach(async (el) => {
-    const id = el.dataset.count!;
+  // آخر رقم معروف يُحفظ في المتصفح، فلا يظهر صفر خاطئ إذا تعثّرت الخدمة أو رفضت الطلب مؤقتًا
+  const cacheKey = (id: string) => `dlc:${id}`;
+  const show = (id: string, v: number) => {
+    document.querySelectorAll<HTMLElement>(`[data-count="${id}"]`).forEach((el) => (el.textContent = fmt(v)));
+    try { localStorage.setItem(cacheKey(id), String(v)); } catch {}
+  };
+  const load = async (id: string, tries = 3): Promise<void> => {
     try {
-      const r = await fetch(`${API}/get/${NS}/${key(id)}`);
-      el.textContent = r.ok ? fmt((await r.json()).value ?? 0) : "0";
-    } catch { el.textContent = "–"; }
+      const r = await fetch(`${API}/get/${NS}/${key(id)}`, { cache: "no-store" });
+      if (r.ok) { const v = (await r.json()).value; if (typeof v === "number") return show(id, v); }
+      else if (r.status === 404) return show(id, 0);   // لم يُنزَّل الملف بعد
+    } catch {}
+    if (tries > 1) { await new Promise((res) => setTimeout(res, 2500)); return load(id, tries - 1); }
+  };
+  const ids = new Set<string>();
+  document.querySelectorAll<HTMLElement>("[data-count]").forEach((el) => {
+    const id = el.dataset.count!;
+    let cached: string | null = null;
+    try { cached = localStorage.getItem(cacheKey(id)); } catch {}
+    el.textContent = cached ? fmt(+cached) : "…";
+    ids.add(id);
   });
+  ids.forEach((id) => load(id));
 
   document.querySelectorAll<HTMLAnchorElement>("[data-dl]").forEach((a) => {
     a.addEventListener("click", () => {
@@ -42,7 +58,7 @@ const { id, pdf, pages, published, label = "تنزيل الدراسة" } = Astro
       try { if (localStorage.getItem(seen)) return; localStorage.setItem(seen, "1"); } catch {}
       fetch(`${API}/hit/${NS}/${key(id)}`, { keepalive: true })
         .then((r) => r.json())
-        .then((j) => document.querySelectorAll<HTMLElement>(`[data-count="${id}"]`).forEach((el) => (el.textContent = fmt(j.value))))
+        .then((j) => typeof j.value === "number" && show(id, j.value))
         .catch(() => {});
     });
   });
