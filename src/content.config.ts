@@ -64,6 +64,9 @@ const infographics = defineCollection({
     image: z.string().optional(),              // صورة الغلاف أو صورة الإنفوجرافيك
     pdf: z.string().optional(),                // ملف للتنزيل
     pages: z.number().optional(),
+    youtube: z.string().optional(),            // معرّف فيديو يوتيوب
+    duration: z.string().optional(),           // مدة الفيديو
+    doc: z.string().optional(),                // معرّف وثيقة في الأرشيف يرتبط بها
     summary: z.string().optional(),            // سطران يظهران في البطاقة
     article: z.string().optional(),            // معرّف مقال مرتبط
     order: z.number().default(0),

@@ -3,12 +3,15 @@ import { getCollection, getEntry } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import PageHead from "../../components/PageHead.astro";
 import ArchiveCard from "../../components/ArchiveCard.astro";
+import VideoEmbed from "../../components/VideoEmbed.astro";
 import { arDate } from "../../data/utils";
 
 const all = await getCollection("infographics");
 // العناصر التي لها ملف للتنزيل أو صفحة تفاصيل تظهر بطاقات، والصور وحدها تظهر في المعرض
 const docs = all.filter((i) => i.data.pdf).sort((a, b) => b.data.order - a.data.order || (b.data.year ?? 0) - (a.data.year ?? 0));
-const items = all.filter((i) => !i.data.pdf && i.data.image).sort((a, b) => (b.data.date?.valueOf() ?? 0) - (a.data.date?.valueOf() ?? 0));
+const videos = all.filter((i) => i.data.youtube).sort((a, b) => (b.data.date?.valueOf() ?? 0) - (a.data.date?.valueOf() ?? 0));
+const docTitle = (id?: string) => all.find((i) => i.id === id);
+const items = all.filter((i) => !i.data.pdf && !i.data.youtube && i.data.image).sort((a, b) => (b.data.date?.valueOf() ?? 0) - (a.data.date?.valueOf() ?? 0));
 const withArticles = await Promise.all(
   items.map(async (i) => ({ ...i, post: i.data.article ? await getEntry("posts", i.data.article) : undefined }))
 );
@@ -25,9 +28,32 @@ const withArticles = await Promise.all(
     </section>
   )}
 
-  {(withArticles.length > 0 || docs.length === 0) && (
+  {videos.length > 0 && (
+    <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-14">
+      <h2 class="text-[1.6rem]">الإنفوجرافيك</h2>
+      <div class="mt-8 grid md:grid-cols-2 gap-6">
+        {videos.map((v) => {
+          const doc = docTitle(v.data.doc);
+          return (
+            <figure class="rounded-2xl border border-[var(--rule)] bg-[var(--bg)] overflow-hidden">
+              <VideoEmbed id={v.data.youtube!} title={v.data.title} poster={v.data.image} />
+              <figcaption class="p-5">
+                <p class="font-bold leading-[1.7]">{v.data.title}</p>
+                <p class="mt-1 text-[0.9rem] text-[var(--muted)] flex flex-wrap gap-x-4">
+                  {v.data.duration && <span>{v.data.duration}</span>}
+                  {doc && <a href={`/infographics/${doc.id}/`} class="text-indigo dark:text-saffron">الوثيقة: تفاصيلها وتنزيلها</a>}
+                </p>
+              </figcaption>
+            </figure>
+          );
+        })}
+      </div>
+    </section>
+  )}
+
+  {(withArticles.length > 0 || (docs.length === 0 && videos.length === 0)) && (
   <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-12">
-    {docs.length > 0 && <h2 class="text-[1.6rem] mb-8">الإنفوجرافيك</h2>}
+    {docs.length > 0 && videos.length === 0 && <h2 class="text-[1.6rem] mb-8">الإنفوجرافيك</h2>}
     {withArticles.length ? (
       <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
         {withArticles.map((i, n) => (

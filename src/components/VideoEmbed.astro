@@ -1,0 +1,28 @@
+---
+// فيديو يوتيوب: تظهر صورته أولًا، ويُحمَّل المشغّل عند الضغط فقط
+interface Props { id: string; title: string; poster?: string; class?: string }
+const { id, title, poster, class: cls = "" } = Astro.props;
+---
+<div class={`relative aspect-video bg-black overflow-hidden ${cls}`} data-yt={id}>
+  <button type="button" class="group/v absolute inset-0 w-full h-full" aria-label={`تشغيل: ${title}`}>
+    <img src={poster ?? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" class="w-full h-full object-cover opacity-75 group-hover/v:opacity-100 transition-opacity" />
+    <span class="absolute inset-0 grid place-items-center">
+      <span class="w-16 h-16 rounded-full bg-[#b3261e] grid place-items-center shadow-lg group-hover/v:scale-105 transition-transform">
+        <svg viewBox="0 0 24 24" class="w-7 h-7 fill-white" aria-hidden="true"><path d="M9 5.5v13l10-6.5z"/></svg>
+      </span>
+    </span>
+  </button>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>("[data-yt]").forEach((box) => {
+    box.querySelector("button")?.addEventListener("click", () => {
+      const f = document.createElement("iframe");
+      f.src = `https://www.youtube-nocookie.com/embed/${box.dataset.yt}?autoplay=1&rel=0`;
+      f.title = box.querySelector("button")?.getAttribute("aria-label") ?? "";
+      f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      f.allowFullscreen = true;
+      f.className = "absolute inset-0 w-full h-full";
+      box.replaceChildren(f);
+    });
+  });
+</script>
