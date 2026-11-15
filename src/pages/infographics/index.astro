@@ -19,35 +19,40 @@ const withArticles = await Promise.all(
 <Base title="أرشيف الإنفوجرافيك" description="أرشيف الإنفوجرافيك والصور التوضيحية التي أعدها الباحث أحمد عباس الملجمي.">
   <PageHead title="أرشيف الإنفوجرافيك" lead="وثائق وتصاميم توضيحية رافقت المقالات والدراسات، متاحة للاطلاع والتنزيل." />
 
-  {docs.length > 0 && (
-    <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-12">
-      <h2 class="text-[1.6rem]">الوثائق</h2>
-      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {docs.map((i) => <ArchiveCard item={i} />)}
-      </div>
-    </section>
-  )}
-
-  {videos.length > 0 && (
-    <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-14">
-      <h2 class="text-[1.6rem]">الإنفوجرافيك</h2>
-      <div class="mt-8 grid md:grid-cols-2 gap-6">
-        {videos.map((v) => {
-          const doc = docTitle(v.data.doc);
-          return (
-            <figure class="rounded-2xl border border-[var(--rule)] bg-[var(--bg)] overflow-hidden">
-              <VideoEmbed id={v.data.youtube!} title={v.data.title} poster={v.data.image} />
-              <figcaption class="p-5">
-                <p class="font-bold leading-[1.7]">{v.data.title}</p>
-                <p class="mt-1 text-[0.9rem] text-[var(--muted)] flex flex-wrap gap-x-4">
-                  {v.data.duration && <span>{v.data.duration}</span>}
-                  {doc && <a href={`/infographics/${doc.id}/`} class="text-indigo dark:text-saffron">الوثيقة: تفاصيلها وتنزيلها</a>}
-                </p>
-              </figcaption>
-            </figure>
-          );
-        })}
-      </div>
+  {(docs.length > 0 || videos.length > 0) && (
+    <!-- على الحاسوب: الوثائق يمينًا والفيديو يسارًا في صف واحد، وعلى الجوال تحت بعض -->
+    <section class:list={["mx-auto max-w-7xl px-5 sm:px-8 pt-12 grid gap-x-8 gap-y-14 items-start",
+      docs.length && videos.length ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]" : ""]}>
+      {docs.length > 0 && (
+        <div>
+          <h2 class="text-[1.6rem]">الوثائق</h2>
+          <div class:list={["mt-8 grid gap-6", videos.length ? "sm:grid-cols-2 lg:grid-cols-1" : "sm:grid-cols-2 lg:grid-cols-3"]}>
+            {docs.map((i) => <ArchiveCard item={i} />)}
+          </div>
+        </div>
+      )}
+      {videos.length > 0 && (
+        <div>
+          <h2 class="text-[1.6rem]">الإنفوجرافيك</h2>
+          <div class="mt-8 grid gap-6">
+            {videos.map((v) => {
+              const doc = docTitle(v.data.doc);
+              return (
+                <figure class="rounded-2xl border border-[var(--rule)] bg-[var(--bg)] overflow-hidden">
+                  <VideoEmbed id={v.data.youtube!} title={v.data.title} poster={v.data.image} />
+                  <figcaption class="p-5">
+                    <p class="font-bold leading-[1.7]">{v.data.title}</p>
+                    <p class="mt-1 text-[0.9rem] text-[var(--muted)] flex flex-wrap gap-x-4">
+                      {v.data.duration && <span>{v.data.duration}</span>}
+                      {doc && <a href={`/infographics/${doc.id}/`} class="text-indigo dark:text-saffron">الوثيقة: تفاصيلها وتنزيلها</a>}
+                    </p>
+                  </figcaption>
+                </figure>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </section>
   )}
 
