@@ -43,6 +43,7 @@ const socials = activeSocials();
       if (t === "dark" || (!t && matchMedia("(prefers-color-scheme: dark)").matches)) document.documentElement.classList.add("dark");
     } catch (e) {}
   </script>
+  <slot name="head" />
   <!-- إحصاء الزوار: GoatCounter -->
   <script is:inline data-goatcounter="https://almaljamie.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>

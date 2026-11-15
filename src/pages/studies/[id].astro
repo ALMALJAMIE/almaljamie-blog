@@ -35,6 +35,20 @@ const facts = [
 const others = all.filter((s) => s.id !== study.id).slice(0, 3);
 ---
 <Base title={d.title} description={d.summary} type="article" image={d.cover} keywords={d.keywords}>
+  <!-- بيانات للفهرسة في Google Scholar -->
+  <Fragment slot="head">
+    <meta name="citation_title" content={d.title} />
+    {(d.authors.length ? d.authors : [d.lang === "en" ? "Ahmed Abbas Almaljamie" : site.title]).map((a) => <meta name="citation_author" content={a} />)}
+    {d.year && <meta name="citation_publication_date" content={String(d.year)} />}
+    {d.journal && <meta name="citation_journal_title" content={d.journal} />}
+    {d.publisher && <meta name="citation_publisher" content={d.publisher} />}
+    {d.issn && <meta name="citation_issn" content={d.issn} />}
+    {d.doi && <meta name="citation_doi" content={d.doi} />}
+    {d.pages && <meta name="citation_num_pages" content={String(d.pages)} />}
+    {d.pdf && <meta name="citation_pdf_url" content={new URL(d.pdf, site.url).href} />}
+    <meta name="citation_language" content={d.lang} />
+    {d.keywords.length > 0 && <meta name="citation_keywords" content={d.keywords.join("; ")} />}
+  </Fragment>
   <section class="relative bg-indigo text-white overflow-hidden">
     <div class="absolute inset-0 pattern"></div>
     <div class="relative mx-auto max-w-7xl px-5 sm:px-8 py-12 md:py-14">
