@@ -24,11 +24,11 @@ const sections = [
     ],
   },
   {
-    title: "المشروع البحثي",
+    title: "المشاريع البحثية",
     items: [
       "**محددات الذهنية اليمنية:** مشروع من ست دراسات، تتناول كل منها عاملًا من العوامل التي شكّلت طريقة تفكير الإنسان اليمني: الاجتماعي، والاقتصادي، والسياسي، والديني، والثقافي، والجغرافي.",
-      "**المنشور منه:** دراسة المحدد الاجتماعي، في مجلة محكّمة.",
-      "**قيد الإنجاز:** دراسة المحدد الاقتصادي.",
+      "**المنشور منه:** [المحددات الاجتماعية ودورها في تشكّل ذهنية الإنسان اليمني](/studies/social-determinants/).",
+      "**السلطات الحاكمة في المجتمع اليمني:** منشور منها ثلاث دراسات: [سلطة العمامة](/studies/turban-authority/)، و[سلطة الزامل](/studies/zamil-authority/)، و[سلطة العيب](/studies/aib-authority/).",
     ],
   },
   {
@@ -48,7 +48,9 @@ const sections = [
     ],
   },
 ];
-const md = (s: string) => s.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(--fg)]">$1</strong>');
+const md = (s: string) =>
+  s.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(--fg)]">$1</strong>')
+   .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" class="text-indigo dark:text-saffron underline underline-offset-4 decoration-1 hover:decoration-2">$1</a>');
 ---
 <Base title="السيرة الذاتية" description="السيرة الذاتية للباحث اليمني أحمد عباس الملجمي.">
   <section class="relative bg-indigo text-white overflow-hidden">
