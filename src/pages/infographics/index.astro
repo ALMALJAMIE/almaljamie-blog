@@ -1,18 +1,33 @@
 ---
 import { getCollection, getEntry } from "astro:content";
-import Base from "../layouts/Base.astro";
-import PageHead from "../components/PageHead.astro";
-import { arDate } from "../data/utils";
+import Base from "../../layouts/Base.astro";
+import PageHead from "../../components/PageHead.astro";
+import ArchiveCard from "../../components/ArchiveCard.astro";
+import { arDate } from "../../data/utils";
 
-const items = (await getCollection("infographics")).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const all = await getCollection("infographics");
+// العناصر التي لها ملف للتنزيل أو صفحة تفاصيل تظهر بطاقات، والصور وحدها تظهر في المعرض
+const docs = all.filter((i) => i.data.pdf).sort((a, b) => b.data.order - a.data.order || (b.data.year ?? 0) - (a.data.year ?? 0));
+const items = all.filter((i) => !i.data.pdf && i.data.image).sort((a, b) => (b.data.date?.valueOf() ?? 0) - (a.data.date?.valueOf() ?? 0));
 const withArticles = await Promise.all(
   items.map(async (i) => ({ ...i, post: i.data.article ? await getEntry("posts", i.data.article) : undefined }))
 );
 ---
 <Base title="أرشيف الإنفوجرافيك" description="أرشيف الإنفوجرافيك والصور التوضيحية التي أعدها الباحث أحمد عباس الملجمي.">
-  <PageHead title="أرشيف الإنفوجرافيك" lead="تصاميم توضيحية رافقت المقالات والدراسات. اضغط على أي تصميم لعرضه بحجم كامل أو تنزيله." />
+  <PageHead title="أرشيف الإنفوجرافيك" lead="وثائق وتصاميم توضيحية رافقت المقالات والدراسات، متاحة للاطلاع والتنزيل." />
 
+  {docs.length > 0 && (
+    <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-12">
+      <h2 class="text-[1.6rem]">الوثائق</h2>
+      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {docs.map((i) => <ArchiveCard item={i} />)}
+      </div>
+    </section>
+  )}
+
+  {(withArticles.length > 0 || docs.length === 0) && (
   <section class="mx-auto max-w-7xl px-5 sm:px-8 pt-12">
+    {docs.length > 0 && <h2 class="text-[1.6rem] mb-8">الإنفوجرافيك</h2>}
     {withArticles.length ? (
       <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
         {withArticles.map((i, n) => (
@@ -23,7 +38,7 @@ const withArticles = await Promise.all(
             <figcaption class="p-5">
               <p class="font-bold leading-[1.7]">{i.data.title}</p>
               <p class="mt-1 text-[0.9rem] text-[var(--muted)] flex flex-wrap gap-x-4">
-                <time datetime={i.data.date.toISOString()}>{arDate(i.data.date)}</time>
+                {i.data.date && <time datetime={i.data.date.toISOString()}>{arDate(i.data.date)}</time>}
                 {i.post && <a href={`/articles/${i.post.id}/`} class="text-indigo dark:text-saffron">من مقال: {i.post.data.title}</a>}
               </p>
             </figcaption>
@@ -34,6 +49,7 @@ const withArticles = await Promise.all(
       <p class="text-[var(--muted)]">يُضاف أول تصميم قريبًا.</p>
     )}
   </section>
+  )}
 
   <!-- العرض بحجم كامل -->
   <dialog id="viewer" class="m-auto w-[min(1100px,96vw)] max-h-[94vh] rounded-2xl p-0 bg-[var(--bg)] text-[var(--fg)] backdrop:bg-black/80">

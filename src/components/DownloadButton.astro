@@ -1,13 +1,13 @@
 ---
 // زر تنزيل الدراسة مع عدّاد مرات التنزيل
-interface Props { id: string; pdf?: string; pages?: number; published: boolean }
-const { id, pdf, pages, published } = Astro.props;
+interface Props { id: string; pdf?: string; pages?: number; published: boolean; label?: string }
+const { id, pdf, pages, published, label = "تنزيل الدراسة" } = Astro.props;
 ---
 {pdf ? (
   <div class="flex items-stretch gap-2">
     <a href={pdf} download data-dl={id} class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo text-white font-medium no-underline hover:bg-indigo-deep dark:bg-saffron dark:text-ink transition-colors">
       <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-      تنزيل الدراسة (PDF){pages ? ` · ${pages} صفحة` : ""}
+      {label} (PDF){pages ? ` · ${pages} صفحة` : ""}
     </a>
     <span class="shrink-0 min-w-[5.5rem] flex flex-col items-center justify-center px-3 rounded-xl border border-[var(--rule)] leading-tight" title="عدد مرات التنزيل">
       <span data-count={id} class="text-[1.05rem] font-bold tabular-nums">…</span>
@@ -16,7 +16,7 @@ const { id, pdf, pages, published } = Astro.props;
   </div>
 ) : (
   <span class="flex items-center justify-center w-full py-3 rounded-xl border border-dashed border-[var(--rule)] text-[var(--muted)] text-[0.95rem]">
-    {published ? "ملف الدراسة يُضاف قريبًا" : "تُتاح للتنزيل بعد نشرها"}
+    {published ? "الملف يُضاف قريبًا" : "تُتاح للتنزيل بعد نشرها"}
   </span>
 )}
 

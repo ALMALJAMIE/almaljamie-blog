@@ -47,15 +47,26 @@ const studies = defineCollection({
   }),
 });
 
-// أرشيف الإنفوجرافيك: الصورة في public/infographics/ وملف وصف في src/content/infographics/
+// أرشيف الإنفوجرافيك والوثائق: الملفات في public/infographics/ وملف وصف في src/content/infographics/
+// نص الملف بعد علامتي --- هو الملخص الذي يظهر في صفحة العنصر
 const infographics = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/infographics", generateId: slugFromFile }),
   schema: z.object({
     title: z.string(),
-    date: z.coerce.date(),
-    image: z.string(),                 // مثل: /infographics/bayda-key.jpg
-    article: z.string().optional(),    // معرّف المقال المرتبط، مثل: bayda-key
-    category: z.string().optional(),
+    kind: z.string().default("إنفوجرافيك"),   // إنفوجرافيك / وثيقة
+    docType: z.string().optional(),            // وصف النوع، مثل: وثيقة حوثية سرية مسحية
+    preparer: z.string().optional(),           // جهة الإعداد
+    place: z.string().optional(),
+    publisher: z.string().optional(),
+    presenter: z.string().optional(),         // النشر والتقديم
+    year: z.number().optional(),
+    date: z.coerce.date().optional(),          // تاريخ الإضافة إلى الأرشيف، للترتيب
+    image: z.string().optional(),              // صورة الغلاف أو صورة الإنفوجرافيك
+    pdf: z.string().optional(),                // ملف للتنزيل
+    pages: z.number().optional(),
+    summary: z.string().optional(),            // سطران يظهران في البطاقة
+    article: z.string().optional(),            // معرّف مقال مرتبط
+    order: z.number().default(0),
   }),
 });
 

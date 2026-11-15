@@ -1,0 +1,94 @@
+---
+// صفحة عنصر الأرشيف: على اليمين البطاقة وزر التنزيل، وفي الوسط الملخص
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import ArchiveCover from "../../components/ArchiveCover.astro";
+import DownloadButton from "../../components/DownloadButton.astro";
+import Share from "../../components/Share.astro";
+import ArchiveCard from "../../components/ArchiveCard.astro";
+import { site } from "../../data/site";
+
+export async function getStaticPaths() {
+  const all = (await getCollection("infographics")).filter((i) => i.data.pdf);
+  return all.map((item) => ({ params: { id: item.id }, props: { item, all } }));
+}
+interface Props { item: CollectionEntry<"infographics">; all: CollectionEntry<"infographics">[] }
+const { item, all } = Astro.props;
+const d = item.data;
+const { Content } = await render(item);
+const hasBody = (item.body ?? "").trim().length > 0;
+const url = new URL(`/infographics/${item.id}/`, site.url).href;
+const facts = [
+  { label: "النوع", value: d.docType ?? d.kind },
+  { label: "الإعداد", value: d.preparer },
+  { label: "العام", value: d.year ? String(d.year) : undefined },
+  { label: "المكان", value: d.place },
+  { label: "الناشر", value: d.publisher },
+  { label: "النشر والتقديم", value: d.presenter },
+  { label: "عدد الصفحات", value: d.pages ? String(d.pages) : undefined },
+].filter((f) => f.value);
+const others = all.filter((i) => i.id !== item.id).slice(0, 3);
+const desc = d.summary ?? `${d.docType ?? d.kind}${d.place ? ` عن ${d.place}` : ""}${d.year ? ` (${d.year})` : ""}، متاحة للتنزيل.`;
+---
+<Base title={d.title} description={desc} type="article" image={d.image}>
+  <section class="relative bg-indigo text-white overflow-hidden">
+    <div class="absolute inset-0 pattern"></div>
+    <div class="relative mx-auto max-w-7xl px-5 sm:px-8 py-12 md:py-14">
+      <nav aria-label="مسار الصفحة" class="text-[0.9rem] text-white/60">
+        <a href="/" class="no-underline hover:text-white">الرئيسية</a><span class="mx-2">/</span>
+        <a href="/infographics/" class="no-underline hover:text-white">أرشيف الإنفوجرافيك</a>
+      </nav>
+      <h1 class="mt-3 text-[1.9rem] sm:text-[2.4rem] leading-[1.5] max-w-4xl">{d.title}</h1>
+      <p class="mt-3 text-saffron text-[1.05rem]">{d.docType ?? d.kind}</p>
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 pt-12 grid lg:grid-cols-[22rem_1fr] gap-10 lg:gap-14 items-start">
+    <aside class="lg:sticky lg:top-28 rounded-2xl border border-[var(--rule)] bg-[var(--bg)] overflow-hidden">
+      {d.image ? (
+        <a href={d.image} target="_blank" rel="noopener" class="block bg-[var(--bg-2)] p-4" title="عرض الصورة بحجم كامل">
+          <img src={d.image} alt={d.title} class="w-full h-auto rounded-md shadow-[0_2px_18px_-6px_rgba(0,0,0,.3)]" />
+        </a>
+      ) : (
+      <div class="bg-[var(--bg-2)] p-6 pb-0">
+        <ArchiveCover title={d.title} kind={d.docType ?? d.kind} year={d.year}
+          class="mx-auto w-[70%] aspect-[3/4] rounded-t-md shadow-[0_-2px_24px_-6px_rgba(0,0,0,.35)]" />
+      </div>
+      )}
+      <div class="p-6">
+        <dl class="divide-y divide-[var(--rule)] text-[0.98rem]">
+          {facts.map((f) => (
+            <div class="py-2.5 flex justify-between gap-4">
+              <dt class="text-[var(--muted)] shrink-0">{f.label}</dt>
+              <dd class="text-end font-medium leading-[1.7] whitespace-pre-line">{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <div class="mt-5"><DownloadButton id={`archive-${item.id}`} pdf={d.pdf} published label="تنزيل الوثيقة" /></div>
+      </div>
+    </aside>
+
+    <article class="min-w-0" data-pagefind-body>
+      <h2 class="text-[1.6rem]">نبذة عن الوثيقة</h2>
+      {hasBody ? (
+        <div class="article prose mt-5"><Content /></div>
+      ) : d.summary ? (
+        <p class="mt-5 text-[1.1rem] leading-[2]">{d.summary}</p>
+      ) : (
+        <p class="mt-5 text-[1.05rem] leading-[2] text-[var(--muted)]">تُضاف النبذة قريبًا.</p>
+      )}
+      <div class="mt-10 pt-8 border-t border-[var(--rule)]" data-pagefind-ignore>
+        <Share url={url} title={d.title} label="شارك الوثيقة" />
+      </div>
+    </article>
+  </div>
+
+  {others.length > 0 && (
+    <section class="mx-auto max-w-7xl px-5 sm:px-8 mt-20" data-pagefind-ignore>
+      <h2 class="text-[1.6rem]">وثائق أخرى</h2>
+      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {others.map((i) => <ArchiveCard item={i} />)}
+      </div>
+    </section>
+  )}
+</Base>
