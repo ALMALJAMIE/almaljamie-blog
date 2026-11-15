@@ -2,8 +2,13 @@
 // زر تنزيل الدراسة مع عدّاد مرات التنزيل
 interface Props { id: string; pdf?: string; pages?: number; published: boolean; label?: string }
 const { id, pdf, pages, published, label = "تنزيل الدراسة" } = Astro.props;
+import { statSync } from "node:fs";
+// حجم الملف يظهر للقارئ قبل التنزيل
+let size = "";
+try { if (pdf) { const b = statSync(`public${decodeURI(pdf)}`).size; size = b >= 1048576 ? `${Math.round(b / 1048576)} ميغابايت` : `${Math.max(1, Math.round(b / 1024))} كيلوبايت`; } } catch {}
 ---
 {pdf ? (
+  <div>
   <div class="flex items-stretch gap-2">
     <a href={pdf} download data-dl={id} class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo text-white font-medium no-underline hover:bg-indigo-deep dark:bg-saffron dark:text-ink transition-colors">
       <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
@@ -13,6 +18,11 @@ const { id, pdf, pages, published, label = "تنزيل الدراسة" } = Astro
       <span data-count={id} class="text-[1.05rem] font-bold tabular-nums">…</span>
       <span class="text-[0.75rem] text-[var(--muted)]">تنزيل</span>
     </span>
+  </div>
+  {size && <p class="mt-1.5 text-[0.8rem] text-[var(--muted)]">حجم الملف: {size}</p>}
+  <p data-inapp-note={id} hidden class="mt-2 rounded-lg bg-saffron/15 px-3 py-2 text-[0.88rem] leading-[1.8]">
+    أنت تتصفح من داخل تطبيق فيسبوك أو إنستغرام. سيُفتح الملف في متصفح الجوال ويبدأ تنزيله، وقد تظهر صفحة فارغة أثناء ذلك. تابع التنزيل من شريط الإشعارات أو من مجلد التنزيلات.
+  </p>
   </div>
 ) : (
   <span class="flex items-center justify-center w-full py-3 rounded-xl border border-dashed border-[var(--rule)] text-[var(--muted)] text-[0.95rem]">
@@ -54,6 +64,9 @@ const { id, pdf, pages, published, label = "تنزيل الدراسة" } = Astro
   document.querySelectorAll<HTMLAnchorElement>("[data-dl]").forEach((a) => {
     a.addEventListener("click", () => {
       const id = a.dataset.dl!;
+      // متصفحات فيسبوك وإنستغرام الداخلية لا تنزّل الملفات بنفسها، فننبّه القارئ
+      if (/FBAN|FBAV|FB_IAB|Instagram/i.test(navigator.userAgent))
+        document.querySelectorAll<HTMLElement>(`[data-inapp-note="${id}"]`).forEach((n) => (n.hidden = false));
       const seen = `dl:${id}`;
       try { if (localStorage.getItem(seen)) return; localStorage.setItem(seen, "1"); } catch {}
       fetch(`${API}/hit/${NS}/${key(id)}`, { keepalive: true })
