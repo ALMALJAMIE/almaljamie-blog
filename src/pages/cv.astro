@@ -5,7 +5,8 @@ import { site } from "../data/site";
 
 // البيانات الأساسية — عدّلها أو أضف إليها
 const facts = [
-  { label: "التخصص", value: "علم الاجتماع والأنثروبولوجيا" },
+  { label: "التخصص", value: "علم اجتماع سياسي" },
+  { label: "الاهتمامات البحثية", value: "علم الاجتماع\nالأنثروبولوجيا الثقافية\nتاريخ الذهنيات" },
   { label: "الانتماء الأكاديمي", value: "قسم التاريخ والحضارة، كلية الدراسات الإسلامية، جامعة السلطان زين العابدين، ترنجانو" },
   { label: "البلد", value: "اليمن، محافظة البيضاء" },
   { label: "الإقامة", value: "كوالالمبور، ماليزيا" },
@@ -75,7 +76,7 @@ const md = (s: string) => s.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(
           {facts.map((f) => (
             <div class="py-3">
               <dt class="text-[0.85rem] text-[var(--muted)]">{f.label}</dt>
-              <dd class="mt-0.5 font-medium leading-[1.8]">{f.value}</dd>
+              <dd class="mt-0.5 font-medium leading-[1.8] whitespace-pre-line">{f.value}</dd>
             </div>
           ))}
         </dl>
