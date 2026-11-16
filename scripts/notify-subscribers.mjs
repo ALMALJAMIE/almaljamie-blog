@@ -48,7 +48,7 @@ for (const file of added) {
   const kind = isStudy ? "دراسة جديدة" : "مقال جديد";
   const button = isStudy ? "اقرأ الملخص ونزّل الدراسة" : "اقرأ المقال كاملًا";
 
-<div dir="rtl" style="text-align:right;font-size:17px;line-height:1.9">
+  const body = `<div dir="rtl" style="text-align:right;font-size:17px;line-height:1.9">
 <p style="color:#c8962e;margin:0">${kind}</p>
 <h2 style="margin:6px 0 14px">${esc(title)}</h2>
 ${cover ? `<p><a href="${url}"><img src="${SITE}${cover}" alt="" style="max-width:100%;border-radius:8px"></a></p>` : ""}
