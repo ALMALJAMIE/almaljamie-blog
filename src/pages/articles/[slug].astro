@@ -6,7 +6,6 @@ import Share from "../../components/Share.astro";
 import PostItem from "../../components/PostItem.astro";
 import ViewCount from "../../components/ViewCount.astro";
 import Subscribe from "../../components/Subscribe.astro";
-import ListenPlayer from "../../components/ListenPlayer.astro";
 import { getPosts, arDate, readingTime, tagUrl, catUrl, type Post } from "../../data/utils";
 import { site } from "../../data/site";
 
@@ -26,7 +25,6 @@ const sIdx = series.findIndex((p) => p.id === post.id);
 const sPrev = sIdx > 0 ? series[sIdx - 1] : undefined;
 const sNext = sIdx >= 0 && sIdx < series.length - 1 ? series[sIdx + 1] : undefined;
 const latest = all.filter((p) => p.id !== post.id).slice(0, 5);
-const words = (post.body || "").split(/\s+/).filter(Boolean).length;
 const related = all.filter((p) => p.id !== post.id && p.data.category === d.category && !(d.series && p.data.series === d.series)).slice(0, 3);
 ---
 <Base title={d.title} description={d.summary} type="article" image={d.cover} keywords={d.tags}>
@@ -51,9 +49,8 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
       )}
     </header>
 
-    <!-- أدوات القراءة: الاستماع وحجم الخط -->
+    <!-- أداة حجم الخط -->
     <div class="mt-6 pt-5 border-t border-[var(--rule)] flex flex-wrap items-center gap-3 print:hidden" data-pagefind-ignore>
-      <ListenPlayer words={words} />
       <div class="flex items-center gap-1 rounded-full bg-[var(--bg-2)] border border-[var(--rule)] p-1 h-14" role="group" aria-label="حجم خط القراءة">
         <button type="button" id="font-down" class="w-11 h-11 grid place-items-center rounded-full hover:bg-[var(--bg)] disabled:opacity-35 disabled:cursor-not-allowed" aria-label="تصغير الخط" title="تصغير الخط">
           <span class="font-[family-name:var(--font-read)] text-[0.95rem] leading-none">ع</span>
