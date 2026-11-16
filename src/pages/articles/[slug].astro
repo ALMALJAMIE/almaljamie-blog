@@ -6,6 +6,7 @@ import Share from "../../components/Share.astro";
 import PostItem from "../../components/PostItem.astro";
 import ViewCount from "../../components/ViewCount.astro";
 import Subscribe from "../../components/Subscribe.astro";
+import ListenPlayer from "../../components/ListenPlayer.astro";
 import { getPosts, arDate, readingTime, tagUrl, catUrl, type Post } from "../../data/utils";
 import { site } from "../../data/site";
 
@@ -24,60 +25,53 @@ const series = d.series ? all.filter((p) => p.data.series === d.series).sort((a,
 const sIdx = series.findIndex((p) => p.id === post.id);
 const sPrev = sIdx > 0 ? series[sIdx - 1] : undefined;
 const sNext = sIdx >= 0 && sIdx < series.length - 1 ? series[sIdx + 1] : undefined;
+const latest = all.filter((p) => p.id !== post.id).slice(0, 5);
+const words = (post.body || "").split(/\s+/).filter(Boolean).length;
 const related = all.filter((p) => p.id !== post.id && p.data.category === d.category && !(d.series && p.data.series === d.series)).slice(0, 3);
 ---
 <Base title={d.title} description={d.summary} type="article" image={d.cover} keywords={d.tags}>
   <div id="progress" class="fixed top-0 inset-x-0 h-[3px] bg-saffron z-50" aria-hidden="true"></div>
 
-  <!-- أداة حجم خط القراءة: كل نقرة تصغّر الخط أو تكبّره درجة -->
-  <div class="fixed bottom-5 start-5 z-40 flex items-center gap-1 rounded-full bg-[var(--bg)] border border-[var(--rule)] shadow-[0_8px_24px_-8px_rgba(19,41,75,.35)] p-1 print:hidden" role="group" aria-label="حجم خط القراءة" data-pagefind-ignore>
-    <button type="button" id="font-down" class="w-10 h-10 grid place-items-center rounded-full hover:bg-[var(--bg-2)] disabled:opacity-35 disabled:cursor-not-allowed" aria-label="تصغير الخط" title="تصغير الخط">
-      <span class="font-[family-name:var(--font-read)] text-[0.95rem] leading-none">ع</span>
-    </button>
-    <span id="font-level" class="min-w-[3.2rem] text-center text-[0.85rem] text-[var(--muted)] tabular-nums" aria-live="polite">100%</span>
-    <button type="button" id="font-up" class="w-10 h-10 grid place-items-center rounded-full hover:bg-[var(--bg-2)] disabled:opacity-35 disabled:cursor-not-allowed" aria-label="تكبير الخط" title="تكبير الخط">
-      <span class="font-[family-name:var(--font-read)] text-[1.6rem] leading-none">ع</span>
-    </button>
-  </div>
-
-  <article data-pagefind-body>
-    <header class="mx-auto max-w-4xl px-5 sm:px-8 pt-12 md:pt-16 text-center">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 pt-10 md:pt-14 grid lg:grid-cols-[minmax(0,1fr)_19rem] gap-x-14">
+  <article data-pagefind-body class="min-w-0">
+    <header>
       <a href={catUrl(d.category)} class="font-display text-glass-green dark:text-[#7cc4a9] no-underline" data-pagefind-filter="التصنيف">{d.category}</a>
-      <h1 class="mt-3 font-display font-bold text-[2.2rem] sm:text-5xl leading-[1.4] text-balance">{d.title}</h1>
-      {d.summary && <p class="mt-5 text-[1.25rem] leading-[2] text-[var(--muted)] max-w-2xl mx-auto text-pretty">{d.summary}</p>}
-      <div class="mt-6 flex flex-wrap justify-center items-center gap-x-5 gap-y-1 text-[1rem] text-[var(--muted)]">
-        <span>{site.title}</span>
+      <h1 class="mt-2 font-display font-bold text-[2rem] sm:text-[2.6rem] leading-[1.45] text-balance">{d.title}</h1>
+      {d.summary && <p class="mt-4 text-[1.2rem] leading-[1.95] text-[var(--muted)] max-w-3xl text-pretty">{d.summary}</p>}
+      <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1 text-[0.98rem] text-[var(--muted)]">
+        <a href="/cv/" class="font-medium text-[var(--fg)] no-underline hover:text-indigo dark:hover:text-saffron">{site.title}</a>
         <time datetime={d.date.toISOString()}>{arDate(d.date)}</time>
         <span>{readingTime(post.body)}</span>
         <ViewCount stat={`view-${post.id}`} hit />
       </div>
       {d.source && (
-        <p class="mt-2 text-[1rem] text-[var(--muted)]">
+        <p class="mt-1.5 text-[0.98rem] text-[var(--muted)]">
           نُشر أيضًا في {d.sourceUrl ? <a href={d.sourceUrl} class="text-glass-blue dark:text-[#8fb4e8]">{d.source}</a> : d.source}
         </p>
       )}
     </header>
 
-    <div class="mx-auto max-w-5xl px-5 sm:px-8 mt-10" data-pagefind-ignore>
-      {d.cover
-        ? <img src={d.cover} alt={d.title} class="w-full h-auto max-h-[80vh] object-contain rounded-xl bg-[var(--bg-2)]" />
-        : <Cover id={post.id} category={d.category} alt={d.title} class="w-full aspect-[21/9] rounded-xl" />}
+    <!-- أدوات القراءة: الاستماع وحجم الخط -->
+    <div class="mt-6 pt-5 border-t border-[var(--rule)] flex flex-wrap items-center gap-3 print:hidden" data-pagefind-ignore>
+      <ListenPlayer words={words} />
+      <div class="flex items-center gap-1 rounded-full bg-[var(--bg-2)] border border-[var(--rule)] p-1 h-14" role="group" aria-label="حجم خط القراءة">
+        <button type="button" id="font-down" class="w-11 h-11 grid place-items-center rounded-full hover:bg-[var(--bg)] disabled:opacity-35 disabled:cursor-not-allowed" aria-label="تصغير الخط" title="تصغير الخط">
+          <span class="font-[family-name:var(--font-read)] text-[0.95rem] leading-none">ع</span>
+        </button>
+        <span id="font-level" class="min-w-[3.2rem] text-center text-[0.85rem] text-[var(--muted)] tabular-nums cursor-pointer" title="الحجم الأصلي" aria-live="polite">100%</span>
+        <button type="button" id="font-up" class="w-11 h-11 grid place-items-center rounded-full hover:bg-[var(--bg)] disabled:opacity-35 disabled:cursor-not-allowed" aria-label="تكبير الخط" title="تكبير الخط">
+          <span class="font-[family-name:var(--font-read)] text-[1.6rem] leading-none">ع</span>
+        </button>
+      </div>
     </div>
 
-    <div class="mx-auto max-w-6xl px-5 sm:px-8 mt-12 grid lg:grid-cols-[1fr_38rem_1fr] gap-10">
-      <aside class="hidden lg:block" data-pagefind-ignore>
-        {toc.length > 1 && (
-          <nav class="sticky top-28 font-display text-[0.95rem]" aria-label="محتويات المقال">
-            <p class="text-[var(--muted)] mb-3">في هذا المقال</p>
-            <ol class="space-y-2 border-s-2 border-[var(--rule)]">
-              {toc.map((h) => (
-                <li><a href={`#${h.slug}`} data-toc={h.slug} class="block -ms-[2px] ps-4 border-s-2 border-transparent no-underline text-[var(--muted)] hover:text-[var(--fg)] leading-relaxed">{h.text}</a></li>
-              ))}
-            </ol>
-          </nav>
-        )}
-      </aside>
-      <div class="article prose min-w-0">
+    <figure class="mt-6" data-pagefind-ignore>
+      {d.cover
+        ? <img src={d.cover} alt={d.title} class="w-full h-auto max-h-[26rem] object-contain rounded-xl bg-[var(--bg-2)]" />
+        : <Cover id={post.id} category={d.category} alt={d.title} class="w-full aspect-[21/8] rounded-xl" />}
+    </figure>
+
+      <div class="article prose min-w-0 mt-10 max-w-[44rem]">
         {series.length > 1 && (
           <details class="not-prose mb-10 rounded-2xl border border-[var(--rule)] bg-[var(--bg-2)] font-[family-name:var(--font-display)] text-[1rem]" data-pagefind-ignore>
             <summary class="cursor-pointer list-none flex items-center justify-between gap-3 p-5">
@@ -98,10 +92,8 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
         )}
         <Content />
       </div>
-      <div></div>
-    </div>
 
-    <footer class="mx-auto max-w-[38rem] px-5 sm:px-0 mt-14" data-pagefind-ignore>
+    <footer class="max-w-[44rem] mt-14" data-pagefind-ignore>
       {d.tags.length > 0 && (
         <div class="mb-8 flex flex-wrap items-center gap-2">
           <span class="text-[var(--muted)] me-1">كلمات مفتاحية:</span>
@@ -152,6 +144,42 @@ const related = all.filter((p) => p.id !== post.id && p.data.category === d.cate
       </nav>
     </footer>
   </article>
+
+  <!-- العمود الجانبي -->
+  <aside class="hidden lg:block" data-pagefind-ignore>
+    <div class="sticky top-28 space-y-8">
+      <div class="rounded-2xl border border-[var(--rule)] p-5 flex gap-4 items-center">
+        <img src="/images/author.jpg" alt="" width="56" height="56" class="w-14 h-14 rounded-full object-cover shrink-0" />
+        <div class="min-w-0">
+          <a href="/cv/" class="font-display font-bold no-underline hover:text-indigo dark:hover:text-saffron">{site.title}</a>
+          <p class="text-[0.88rem] text-[var(--muted)] leading-relaxed">باحث في علم الاجتماع السياسي</p>
+        </div>
+      </div>
+      {toc.length > 1 && (
+        <nav class="font-display text-[0.95rem]" aria-label="محتويات المقال">
+          <p class="font-bold mb-3">في هذا المقال</p>
+          <ol class="space-y-2 border-s-2 border-[var(--rule)]">
+            {toc.map((h) => (
+              <li><a href={`#${h.slug}`} data-toc={h.slug} class="block -ms-[2px] ps-4 border-s-2 border-transparent no-underline text-[var(--muted)] hover:text-[var(--fg)] leading-relaxed">{h.text}</a></li>
+            ))}
+          </ol>
+        </nav>
+      )}
+      <div>
+        <p class="font-display font-bold pb-2 border-b-2 border-[var(--fg)]">أحدث المقالات</p>
+        <ul class="divide-y divide-[var(--rule)]">
+          {latest.map((p) => (
+            <li class="py-3">
+              <a href={`/articles/${p.id}/`} class="block font-display font-medium leading-[1.7] no-underline hover:text-indigo dark:hover:text-saffron">{p.data.title}</a>
+              <span class="text-[0.82rem] text-[var(--muted)]">{arDate(p.data.date)}</span>
+            </li>
+          ))}
+        </ul>
+        <a href="/articles/" class="mt-3 inline-block text-[0.9rem] font-medium text-indigo dark:text-saffron">كل المقالات</a>
+      </div>
+    </div>
+  </aside>
+  </div>
 
   {related.length > 0 && (
     <section class="mx-auto max-w-6xl px-5 sm:px-8 mt-20" data-pagefind-ignore>

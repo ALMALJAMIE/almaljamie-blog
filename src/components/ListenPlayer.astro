@@ -1,0 +1,120 @@
+---
+// «استمع إلى المقال»: يقرأ المتصفح نص المقال بصوت عربي (Web Speech API)، دون ملفات صوتية
+interface Props { words: number }
+const { words } = Astro.props;
+// تقدير المدة بسرعة قراءة صوتية تقارب 140 كلمة في الدقيقة
+const total = Math.max(30, Math.round((words / 140) * 60));
+---
+<div id="listen" data-total={total} class="flex items-center gap-3 rounded-full bg-[var(--bg-2)] border border-[var(--rule)] ps-2 pe-4 h-14 min-w-0 flex-1 basis-full sm:basis-0" data-pagefind-ignore>
+  <button type="button" id="listen-play" class="w-10 h-10 shrink-0 grid place-items-center rounded-full bg-indigo text-white dark:bg-saffron dark:text-ink hover:opacity-90" aria-label="استمع إلى المقال" title="استمع إلى المقال">
+    <svg id="listen-icon-play" viewBox="0 0 24 24" class="w-5 h-5 fill-current" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+    <svg id="listen-icon-pause" viewBox="0 0 24 24" class="w-5 h-5 fill-current hidden" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
+  </button>
+  <span id="listen-time" class="shrink-0 text-[0.92rem] tabular-nums text-[var(--muted)]" dir="ltr">0:00 / {Math.floor(total / 60)}:{String(total % 60).padStart(2, "0")}</span>
+  <div class="relative flex-1 min-w-12 h-1.5 rounded-full bg-[var(--rule)] overflow-hidden cursor-pointer" id="listen-track" title="انتقل إلى موضع">
+    <div id="listen-bar" class="absolute inset-y-0 start-0 w-0 bg-saffron rounded-full"></div>
+  </div>
+  <button type="button" id="listen-rate" class="shrink-0 text-[0.92rem] font-medium tabular-nums w-10 text-center hover:text-indigo dark:hover:text-saffron" title="سرعة القراءة" dir="ltr">1x</button>
+</div>
+<p id="listen-note" hidden class="text-[0.85rem] text-[var(--muted)] mt-2"></p>
+
+<script>
+  const box = document.getElementById("listen")!;
+  const note = document.getElementById("listen-note")!;
+  const playBtn = document.getElementById("listen-play") as HTMLButtonElement;
+  const iconPlay = document.getElementById("listen-icon-play")!, iconPause = document.getElementById("listen-icon-pause")!;
+  const timeEl = document.getElementById("listen-time")!, bar = document.getElementById("listen-bar")!;
+  const track = document.getElementById("listen-track")!, rateBtn = document.getElementById("listen-rate")!;
+  const synth = window.speechSynthesis;
+  const RATES = [1, 1.25, 1.5, 0.75];
+  let rateIdx = 0;
+  try { rateIdx = Math.max(0, RATES.indexOf(+(localStorage.getItem("listenRate") || 1))); } catch {}
+  rateBtn.textContent = `${RATES[rateIdx]}x`;
+
+  // المقاطع: فقرات المقال وعناوينه، مقسّمة إلى جمل قصيرة (المتصفحات تتوقف مع النصوص الطويلة)
+  const blocks = [...document.querySelectorAll<HTMLElement>(".article > h2, .article > h3, .article > p, .article > blockquote, .article > ul > li, .article > ol > li")];
+  const chunks: { text: string; el: HTMLElement; words: number }[] = [];
+  const title = document.querySelector("h1")?.textContent?.trim();
+  if (title) chunks.push({ text: title, el: document.querySelector("h1")!, words: title.split(/\s+/).length });
+  blocks.forEach((el) => {
+    const t = (el.innerText || "").replace(/\s+/g, " ").trim();
+    if (!t) return;
+    (t.match(/[^.!؟?؛;:]+[.!؟?؛;:]*|.+$/g) || [t]).forEach((s) => {
+      s = s.trim(); if (!s) return;
+      // جملة طويلة جدًا تُقسَم عند الفواصل
+      if (s.length > 220) s.split(/(?<=،)/).forEach((p) => p.trim() && chunks.push({ text: p.trim(), el, words: p.split(/\s+/).length }));
+      else chunks.push({ text: s, el, words: s.split(/\s+/).length });
+    });
+  });
+  const totalWords = chunks.reduce((n, c) => n + c.words, 0) || 1;
+  const totalSec = +(box.dataset.total || 60);
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+  let voice: SpeechSynthesisVoice | undefined;
+  const pickVoice = () => {
+    const vs = synth?.getVoices() || [];
+    const ar = vs.filter((v) => v.lang?.toLowerCase().startsWith("ar"));
+    voice = ar.find((v) => /google/i.test(v.name)) || ar.find((v) => /natural|online|premium|enhanced/i.test(v.name)) || ar[0];
+  };
+
+  let idx = 0, playing = false, current: HTMLElement | null = null, gen = 0;
+  const wordsBefore = (i: number) => chunks.slice(0, i).reduce((n, c) => n + c.words, 0);
+  const update = () => {
+    const done = wordsBefore(idx) / totalWords;
+    bar.style.width = `${(done * 100).toFixed(1)}%`;
+    const total = totalSec / RATES[rateIdx];
+    timeEl.textContent = `${fmt(done * total)} / ${fmt(total)}`;
+  };
+  const mark = (el: HTMLElement | null) => {
+    current?.classList.remove("listen-now");
+    current = el; el?.classList.add("listen-now");
+  };
+  const setIcon = () => { iconPlay.classList.toggle("hidden", playing); iconPause.classList.toggle("hidden", !playing); playBtn.setAttribute("aria-label", playing ? "إيقاف مؤقت" : "استمع إلى المقال"); };
+
+  const speak = () => {
+    if (idx >= chunks.length) { playing = false; idx = 0; mark(null); setIcon(); update(); return; }
+    const c = chunks[idx];
+    const my = ++gen;
+    const u = new SpeechSynthesisUtterance(c.text);
+    u.lang = voice?.lang || "ar-SA"; if (voice) u.voice = voice;
+    u.rate = RATES[rateIdx];
+    u.onend = () => { if (!playing || my !== gen) return; idx++; update(); speak(); };
+    u.onerror = (e) => { if (my !== gen || e.error === "interrupted" || e.error === "canceled") return; idx++; if (playing) speak(); };
+    if (current !== c.el) mark(c.el);
+    synth.speak(u);
+  };
+  const start = () => { pickVoice(); playing = true; setIcon(); synth.cancel(); speak(); };
+  const stop = () => { playing = false; gen++; setIcon(); synth.cancel(); };
+
+  if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+    box.classList.add("opacity-50"); playBtn.disabled = true;
+    note.hidden = false; note.textContent = "متصفحك لا يدعم الاستماع إلى المقال. جرّب فتح الصفحة في Chrome أو Safari.";
+  } else {
+    pickVoice();
+    synth.onvoiceschanged = pickVoice;
+    playBtn.addEventListener("click", () => {
+      if (playing) return stop();
+      pickVoice();
+      if (!voice) { note.hidden = false; note.textContent = "لا يوجد صوت عربي مثبّت على جهازك، فقد تُقرأ المقالة بصوت غير عربي. يمكن إضافة الصوت العربي من إعدادات الجهاز (تحويل النص إلى كلام)."; }
+      start();
+    });
+    rateBtn.addEventListener("click", () => {
+      rateIdx = (rateIdx + 1) % RATES.length; rateBtn.textContent = `${RATES[rateIdx]}x`;
+      try { localStorage.setItem("listenRate", String(RATES[rateIdx])); } catch {}
+      update(); if (playing) { gen++; synth.cancel(); speak(); }
+    });
+    track.addEventListener("click", (e) => {
+      const r = track.getBoundingClientRect();
+      const frac = document.dir === "rtl" || getComputedStyle(track).direction === "rtl" ? (r.right - e.clientX) / r.width : (e.clientX - r.left) / r.width;
+      let w = 0, target = 0; const goal = frac * totalWords;
+      for (; target < chunks.length && w + chunks[target].words < goal; target++) w += chunks[target].words;
+      idx = Math.min(target, chunks.length - 1); update();
+      if (playing) { gen++; synth.cancel(); speak(); }
+    });
+    addEventListener("pagehide", () => synth.cancel());
+    update();
+  }
+</script>
+<style is:global>
+  .listen-now { background: color-mix(in oklab, var(--color-saffron, #c8962e) 16%, transparent); border-radius: .35rem; box-shadow: 0 0 0 .35rem color-mix(in oklab, var(--color-saffron, #c8962e) 16%, transparent); transition: background .3s; }
+</style>
