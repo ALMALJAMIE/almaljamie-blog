@@ -50,8 +50,8 @@ const sections = [
   },
 ];
 const md = (s: string) =>
-  s.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(--fg)]">$1</strong>')
-   .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" class="text-indigo dark:text-saffron underline underline-offset-4 decoration-1 hover:decoration-2">$1</a>');
+  s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-indigo dark:text-saffron underline underline-offset-4 decoration-1 hover:decoration-2">$1</a>')
+   .replace(/\*\*(.+?)\*\*/g, '<strong class="text-[var(--fg)]">$1</strong>');
 ---
 <Base title="السيرة الذاتية" description="السيرة الذاتية للباحث اليمني أحمد عباس الملجمي.">
   <section class="relative bg-indigo text-white overflow-hidden">
