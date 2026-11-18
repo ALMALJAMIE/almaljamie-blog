@@ -8,6 +8,7 @@ issue: المجلد 31، العدد 3، الصفحات 230–251
 year: 2025
 doi: 10.20428/JSS.V31I3.2788
 pdf: /files/illegitimate-governance-tools.pdf
+cover: /images/illegitimate-governance-tools-cover.jpg
 summary: "دراسة تتناول أدوات الحكم غير الشرعية وأثرها على الشرعية السياسية في اليمن بين عامي 1990 و2011."
 order: 20
 keywords: [اليمن, الشرعية السياسية, التعددية السياسية, السلطة, النظام السياسي]
