@@ -7,6 +7,7 @@ publisher: جامعة العلوم والتكنولوجيا
 issue: المجلد 31، العدد 10، الصفحات 60–85
 year: 2025
 pdf: /files/yemeni-students-social-sciences.pdf
+cover: /images/yemeni-students-social-sciences-cover.jpg
 summary: "دراسة تبحث في العوامل التي تدفع الطلبة اليمنيين في الجامعات الماليزية إلى العزوف عن تخصصات العلوم الاجتماعية."
 order: 10
 keywords: [العلوم الاجتماعية, الطلاب اليمنيون, الجامعات الماليزية, التخصصات الجامعية, عزوف الطلبة]
